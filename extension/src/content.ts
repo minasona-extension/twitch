@@ -167,16 +167,19 @@ function disconnectObserver() {
 function processNode(node: Node) {
   if (!(node instanceof HTMLElement)) return;
 
-  // get username elements for native and 7tv chat
-  const nativeUsernameEl = node.querySelector<HTMLElement>(".chat-line__username-container");
-  const sevenTvUsernameEl = node.querySelector<HTMLElement>(".seventv-chat-user");
+  // select any elements where the class contains the word "username"
+  // this is most likely the element the username is in
+  const usernameElements = node.querySelectorAll<HTMLElement>('[class*="username"]');
+  // select the last element selected to get the "deepest" element
+  // on native this is important to select only the name and not the element containing badges + name
+  const innerUsernameEl = usernameElements[usernameElements.length - 1] ?? null;
 
   // no username element found
-  if (!nativeUsernameEl && !sevenTvUsernameEl) return;
+  if (!innerUsernameEl) return;
   // minasona-icon already appended
-  if ((sevenTvUsernameEl || nativeUsernameEl).querySelector<HTMLElement>(".minasona-icon")) return;
+  if (innerUsernameEl.querySelector<HTMLElement>(".minasona-icon")) return;
 
-  const username = (sevenTvUsernameEl || nativeUsernameEl).innerText.toLowerCase();
+  const username = innerUsernameEl.innerText.toLowerCase();
   // username not in existing minasonas
   if (!minasonaMap[username]) {
     if (!settingShowForEveryone) return;
@@ -206,40 +209,9 @@ function processNode(node: Node) {
   iconContainer.title = "Minasona";
   iconContainer.append(icon);
 
-  if (sevenTvUsernameEl) {
-    // check if badge div is present
-    const badgeListElement = sevenTvUsernameEl.querySelector<HTMLElement>(".seventv-chat-user-badge-list");
-    if (badgeListElement) {
-      // badge list exists -> just append the icon container
-      iconContainer.style.marginLeft = "2px";
-      badgeListElement.append(iconContainer);
-      return;
-    }
-    // badge list does not exist -> create badge list and prepend to username element
-    const newBadgeListElement = document.createElement("div");
-    newBadgeListElement.classList.add("seventv-chat-user-badge-list");
-    newBadgeListElement.style.display = "inline-flex";
-    newBadgeListElement.style.verticalAlign = "middle";
-    newBadgeListElement.style.marginRight = "4px";
-    newBadgeListElement.append(iconContainer);
-    sevenTvUsernameEl.prepend(newBadgeListElement);
-    return;
-  }
-
-  if (nativeUsernameEl) {
-    // check if badge span is present
-    const badgeListElement = nativeUsernameEl.querySelector<HTMLElement>("span > div > button[data-a-target='chat-badge']");
-    iconContainer.style.marginRight = "4px";
-    if (badgeListElement) {
-      // badge span exists -> just append the icon container
-      badgeListElement.parentElement.parentElement.append(iconContainer);
-      return;
-    }
-    // badge span does not exist -> create badge span and prepend to username element
-    const newBadgeListElement = document.createElement("span");
-    newBadgeListElement.append(iconContainer);
-    nativeUsernameEl.prepend(newBadgeListElement);
-    return;
+  if (innerUsernameEl) {
+    // just prepend iconContainer to name
+    innerUsernameEl.prepend(iconContainer);
   }
 }
 
