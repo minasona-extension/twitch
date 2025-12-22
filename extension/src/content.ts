@@ -219,6 +219,14 @@ function processNode(node: Node) {
   iconContainer.title = "Minasona";
   iconContainer.append(icon);
 
+  // check for ffz and add tooltip if present
+  if (node.querySelector<HTMLElement>("[class*=ffz-]")) {
+    const toolTip = createFFZToolTip(minasonaMap[username].minasonaName, minasonaMap[username].imageUrl);
+    iconContainer.classList.add("ffz-il-tooltip__container", "tw-relative");
+    iconContainer.removeAttribute("title");
+    iconContainer.prepend(toolTip);
+  }
+
   // get badge slot to place icon there if present
   // this is needed to preserve usernames containing color gradients and also the correct display of the pronouns extension
   const badgeSlot = node.querySelector<HTMLElement>(".chat-line__message--badges, .seventv-chat-user-badge-list");
@@ -230,6 +238,34 @@ function processNode(node: Node) {
     // insert after badge slot
     badgeSlot.append(iconContainer);
   }
+}
+
+/**
+ * Creates a tooltip element compatible with FFZ styling.
+ * @param minasonaName The name of the minasona to display.
+ * @param imageUrl The image URL of the minasona to display.
+ * @returns The tooltip HTMLElement.
+ */
+function createFFZToolTip(minasonaName: string, imageUrl: string): HTMLElement {
+  const toolTip = document.createElement("div");
+  toolTip.classList.add("ffz-il-tooltip", "ffz-il-tooltip--align-center", "ffz-il-tooltip--up", "ffz__tooltip--inner", "ffz__tooltip--badges");
+  toolTip.style.textAlign = "center";
+  toolTip.style.fontWeight = "normal";
+  toolTip.style.fontSize = "1.2rem";
+  toolTip.style.borderRadius = "2px";
+  toolTip.setAttribute("role", "tooltip");
+
+  const badgeTip = document.createElement("div");
+  badgeTip.classList.add("ffz-badge-tip");
+  badgeTip.insertAdjacentText("afterbegin", `${minasonaName || "Default"}`);
+  toolTip.append(badgeTip);
+
+  const badge = document.createElement("div");
+  badge.style.backgroundImage = `url("${imageUrl}")`;
+  badge.classList.add("preview-image", "ffz-badge");
+  badgeTip.prepend(badge);
+
+  return toolTip;
 }
 
 /**
