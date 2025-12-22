@@ -244,11 +244,7 @@ function getOrCreatePopover(): HTMLElement {
     popoverInstance = document.createElement("div");
     popoverInstance.classList.add("twitch-minasona-popover");
 
-    // title to show the minasonas name
-    const title = document.createElement("div");
-    title.classList.add("minasona-name");
-    popoverInstance.appendChild(title);
-
+    // image elements for avif and png as a fallback
     const source = document.createElement("source");
     source.type = "image/avif";
     const img = document.createElement("img");
@@ -279,8 +275,6 @@ function getOrCreatePopover(): HTMLElement {
  */
 function showMinasonaPopover(minasonaIcon: HTMLElement, imageUrl: string, fallbackImageUrl: string) {
   const popover = getOrCreatePopover();
-  const title = popover.querySelector<HTMLDivElement>(".minasona-name");
-  title.innerText = "Title";
 
   const source = popover.querySelector<HTMLSourceElement>("source");
   source.srcset = imageUrl;
