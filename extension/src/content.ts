@@ -244,6 +244,10 @@ function getOrCreatePopover(): HTMLElement {
     popoverInstance = document.createElement("div");
     popoverInstance.classList.add("twitch-minasona-popover");
 
+    const loader = document.createElement("div");
+    loader.classList.add("loader");
+    popoverInstance.appendChild(loader);
+
     // image elements for avif and png as a fallback
     const source = document.createElement("source");
     source.type = "image/avif";
@@ -276,10 +280,24 @@ function getOrCreatePopover(): HTMLElement {
 function showMinasonaPopover(minasonaIcon: HTMLElement, imageUrl: string, fallbackImageUrl: string) {
   const popover = getOrCreatePopover();
 
+  const picture = popover.querySelector<HTMLPictureElement>("picture");
+  picture.hidden = true;
+  const loader = popover.querySelector<HTMLDivElement>(".loader");
+  loader.style.display = "block";
   const source = popover.querySelector<HTMLSourceElement>("source");
-  source.srcset = imageUrl;
   const img = popover.querySelector<HTMLImageElement>("img");
-  img.src = fallbackImageUrl;
+  img.classList.remove("loaded");
+
+  preloadImage(imageUrl)
+    .then(() => {
+      swapPicture(source, imageUrl, img, fallbackImageUrl, loader, picture);
+    })
+    .catch(() => {
+      // fallback to png
+      preloadImage(fallbackImageUrl).then(() => {
+        swapPicture(source, null, img, fallbackImageUrl, loader, picture);
+      });
+    });
 
   // get popover dimensions
   const popoverRect = popover.getBoundingClientRect();
@@ -297,4 +315,36 @@ function showMinasonaPopover(minasonaIcon: HTMLElement, imageUrl: string, fallba
 
   // show popover
   popover.classList.add("active");
+}
+
+async function preloadImage(src: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const i = new Image();
+    i.onload = () => resolve();
+    i.onerror = () => reject();
+    i.src = src;
+  });
+}
+
+function swapPicture(
+  sourceElement: HTMLSourceElement,
+  avifSrc: string | null,
+  imageElement: HTMLImageElement,
+  pngSrc: string,
+  loader: HTMLDivElement,
+  pictureElement: HTMLPictureElement,
+) {
+  if (avifSrc) {
+    sourceElement.srcset = avifSrc;
+  } else {
+    sourceElement.srcset = "";
+  }
+  imageElement.src = pngSrc;
+
+  loader.style.display = "none";
+  pictureElement.hidden = false;
+
+  requestAnimationFrame(() => {
+    imageElement.classList.add("loaded");
+  });
 }
