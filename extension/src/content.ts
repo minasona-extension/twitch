@@ -26,6 +26,14 @@ let settingShowInOtherChats = false;
 let settingShowForEveryone = false;
 let settingIconSize = "32";
 
+let ffzIsReady = false;
+window.addEventListener('message', (event) => {
+  if (event.source !== window) return;
+  if (typeof event.data !== 'object' || event.data === null) return;
+  if (typeof event.data?.FFZ_IS_READY === 'undefined') return;
+  ffzIsReady = event.data?.FFZ_IS_READY;
+});
+
 applySettings();
 fetchMinasonaMap();
 startSupervisor();
@@ -220,7 +228,7 @@ function processNode(node: Node) {
   iconContainer.append(icon);
 
   // check for ffz and add tooltip if present
-  if (node.querySelector<HTMLElement>("[class*=ffz-]")) {
+  if (ffzIsReady) {
     const toolTip = createFFZToolTip(minasonaMap[username].minasonaName, minasonaMap[username].imageUrl);
     iconContainer.classList.add("ffz-il-tooltip__container", "tw-relative");
     iconContainer.removeAttribute("title");
@@ -253,7 +261,7 @@ function createFFZToolTip(minasonaName: string, imageUrl: string): HTMLElement {
   toolTip.style.fontWeight = "normal";
   toolTip.style.fontSize = "1.2rem";
   toolTip.style.borderRadius = "2px";
-  toolTip.style.marginBottom = "10px";
+  toolTip.style.marginBottom = "9px";
   toolTip.style.lineHeight = "1";
   toolTip.setAttribute("role", "tooltip");
 

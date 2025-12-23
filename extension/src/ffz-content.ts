@@ -14,8 +14,9 @@ function startFFZListener() {
   window.addEventListener('message', (event) => {
     if (event.source !== window) return;
     if (typeof event.data !== 'object' || event.data === null) return;
+    if (typeof event.data?.FFZ_BADGE_IMAGES_SETTING === 'undefined') return;
 
-    if (event.data?.FFZ_BADGE_IMAGES_SETTING ?? true)
+    if (event.data?.FFZ_BADGE_IMAGES_SETTING)
       styleNode.textContent = '';
     else
       styleNode.textContent = BADGE_CSS;

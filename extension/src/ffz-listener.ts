@@ -16,6 +16,8 @@ new MutationObserver((mutationsList, observer) => {
 }).observe(document.body, { childList: true, subtree: true });
 
 function addons_ready(event) {
+  window.postMessage({ FFZ_IS_READY: true });
+
   FrankerFaceZ.instance.settings.on(":changed:tooltip.badge-images", (value) => {
     window.postMessage({ FFZ_BADGE_IMAGES_SETTING: value });
   });
