@@ -253,7 +253,7 @@ function createFFZToolTip(minasonaName: string, imageUrl: string): HTMLElement {
   toolTip.style.fontWeight = "normal";
   toolTip.style.fontSize = "1.2rem";
   toolTip.style.borderRadius = "2px";
-  toolTip.style.marginBottom = "9px";
+  toolTip.style.marginBottom = "10px";
   toolTip.style.lineHeight = "1";
   toolTip.setAttribute("role", "tooltip");
 
