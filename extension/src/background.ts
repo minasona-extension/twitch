@@ -30,10 +30,10 @@ async function updateMinasonaMap() {
     data.forEach((d) => {
       if (!d.twitchUsername) return;
       reducedData[d.twitchUsername] = {
-        iconUrl: d.minasonaAvif64,
-        fallbackIconUrl: d.minasonaPng64,
-        imageUrl: d.minasonaAvif256,
-        fallbackImageUrl: d.minasonaPng256,
+        iconUrl: encodeURI(d.minasonaAvif64),
+        fallbackIconUrl: encodeURI(d.minasonaPng64),
+        imageUrl: encodeURI(d.minasonaAvif256),
+        fallbackImageUrl: encodeURI(d.minasonaPng256),
       };
     });
 

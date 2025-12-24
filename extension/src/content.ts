@@ -83,7 +83,7 @@ function startSupervisor() {
     // get native and 7tv chat containers
     const nativeChatContainer = document.querySelector<HTMLElement>(".chat-scrollable-area__message-container");
     const sevenTvChatContainer = document.querySelector<HTMLElement>(".seventv-chat-list");
-    const vodChatContainer = document.querySelector<HTMLElement>("ul.InjectLayout-sc-1i43xsx-0"); // todo: test if this is really always the classname
+    const vodChatContainer = document.querySelector<HTMLElement>('ul[class^="InjectLayout-sc"]');
 
     // seven tv has priority
     if (sevenTvChatContainer) {
