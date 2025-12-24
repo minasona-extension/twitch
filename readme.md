@@ -20,13 +20,13 @@ https://microsoftedge.microsoft.com/addons/detail/minasona-twitch-icons/annkpdga
 ### Opera v1.1
 Submitted Dec. 17 -> The extension from the chrome store should work as well
 
-### Firefox v1.2
+### Firefox v1.3
 https://addons.mozilla.org/de/firefox/addon/minasona-twitch-icons/
 
 ## Changelog
 
 ### 1.3
-- You can now **set your own Minasona** on the website: https://minawan.me/ Thanks Hoopywan!
+- You can now **set your own Minasona** on the website: https://minawan.me/ Login with Discord and make sure you have your Twitch account linked. Thanks Hoopywan!
 - More robust username detection
   - hopefully pronouns extension and FFZ should work Prayge
 - **VOD** support
