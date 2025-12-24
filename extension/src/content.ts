@@ -26,14 +26,6 @@ let settingShowInOtherChats = false;
 let settingShowForEveryone = false;
 let settingIconSize = "32";
 
-let ffzIsReady = false;
-window.addEventListener('message', (event) => {
-  if (event.source !== window) return;
-  if (typeof event.data !== 'object' || event.data === null) return;
-  if (typeof event.data?.FFZ_IS_READY !== 'boolean') return;
-  ffzIsReady = event.data?.FFZ_IS_READY;
-});
-
 applySettings();
 fetchMinasonaMap();
 startSupervisor();
@@ -228,7 +220,7 @@ function processNode(node: Node) {
   iconContainer.append(icon);
 
   // check for ffz and add tooltip if present 
-  if (ffzIsReady) {
+  if (node.querySelector("[class*=ffz-]")) {
     const toolTip = createFFZToolTip(minasonaMap[username].minasonaName, minasonaMap[username].imageUrl);
     iconContainer.classList.add("ffz-il-tooltip__container", "tw-relative");
     iconContainer.removeAttribute("title");
@@ -257,7 +249,8 @@ function processNode(node: Node) {
 function createFFZToolTip(minasonaName: string, imageUrl: string): HTMLElement {
   const toolTip = document.createElement("div");
   toolTip.classList.add("ffz-il-tooltip", "ffz-il-tooltip--align-center", "ffz-il-tooltip--up", "ffz__tooltip--inner", "ffz__tooltip--badges");
-  toolTip.style.textAlign = "center";// style tooltip quirks to look like ffz tooltip
+  // style tooltip quirks to look like ffz tooltip
+  toolTip.style.textAlign = "center";
   toolTip.style.fontWeight = "normal";
   toolTip.style.fontSize = "1.2rem";
   toolTip.style.borderRadius = "2px";

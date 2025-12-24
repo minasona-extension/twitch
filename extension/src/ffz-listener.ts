@@ -15,6 +15,11 @@ new MutationObserver((mutationsList, observer) => {
   observer.disconnect();
 }).observe(document.body, { childList: true, subtree: true });
 
+/**
+ * Called when FFZ addons are ready.
+ * Sets up a listener for changes to the badge images setting and sends the initial value.
+ * @param event the event object
+ */
 function addons_ready(event) {
   window.postMessage({ FFZ_IS_READY: true });
 
