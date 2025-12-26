@@ -19,6 +19,19 @@ let settingShowInOtherChats = false;
 let settingShowForEveryone = false;
 let settingIconSize = "32";
 
+window.addEventListener('message', (event) => {
+  if (event.source !== window) return;
+
+  if (typeof event.data?.FFZ_MINASONATWITCHEXTENSION_SETTING_EVERYWHERE === 'boolean')
+    browser.storage.sync.set({ showInOtherChats: event.data?.FFZ_MINASONATWITCHEXTENSION_SETTING_EVERYWHERE });
+  
+  if (typeof event.data?.FFZ_MINASONATWITCHEXTENSION_SETTING_EVERYWAN === 'boolean')
+    browser.storage.sync.set({ showForEveryone: event.data?.FFZ_MINASONATWITCHEXTENSION_SETTING_EVERYWAN });
+
+  if (typeof event.data?.FFZ_MINASONATWITCHEXTENSION_SETTING_SIZE === 'string')
+    browser.storage.sync.set({ iconSize:event.data?.FFZ_MINASONATWITCHEXTENSION_SETTING_SIZE });
+});
+
 applySettings();
 fetchMinasonaMap();
 startSupervisor();
@@ -65,6 +78,10 @@ async function applySettings() {
   if (settingIconSize != result.iconSize) {
     settingIconSize = result.iconSize || "32";
   }
+
+  window.postMessage({ FFZ_MINASONATWITCHEXTENSION_SHOWINOTHERCHATS: settingShowInOtherChats });
+  window.postMessage({ FFZ_MINASONATWITCHEXTENSION_SHOWFOREVERYONE: settingShowForEveryone });
+  window.postMessage({ FFZ_MINASONATWITCHEXTENSION_ICONSIZE: settingIconSize });
 }
 // listen for settings changes
 browser.storage.onChanged.addListener((_changes, namespace) => {
@@ -208,12 +225,15 @@ function processNode(node: Node) {
   icon.appendChild(img);
   // add popover on click if its not a default minasona
   if (minasonaMap[username].imageUrl) {
-    icon.addEventListener("click", (e) => {
+    const clickPopupHandler = (e) => {
       e.preventDefault();
       e.stopPropagation();
-
       showMinasonaPopover(e.target as HTMLElement, minasonaMap[username].imageUrl, minasonaMap[username].fallbackImageUrl);
-    });
+    };
+
+    icon.addEventListener("click", clickPopupHandler);
+    node.querySelector('.ffz-badge[data-badge*="addon.minasona_twitch_extension.badge"]')
+      ?.addEventListener('click', clickPopupHandler);
   }
 
   // create icon container
@@ -221,14 +241,6 @@ function processNode(node: Node) {
   iconContainer.classList.add("minasona-icon-container");
   iconContainer.title = "Minasona";
   iconContainer.append(icon);
-
-  // check for ffz and add tooltip if present 
-  if (node.querySelector("[class*=ffz-]")) {
-    const toolTip = createFFZToolTip(minasonaMap[username].minasonaName, minasonaMap[username].imageUrl);
-    iconContainer.classList.add("ffz-il-tooltip__container", "tw-relative");
-    iconContainer.removeAttribute("title");
-    iconContainer.prepend(toolTip);
-  }
 
   // get badge slot to place icon there if present
   // this is needed to preserve usernames containing color gradients and also the correct display of the pronouns extension
@@ -241,38 +253,17 @@ function processNode(node: Node) {
     // insert after badge slot
     badgeSlot.append(iconContainer);
   }
-}
 
-/**
- * Creates a tooltip element compatible with FFZ styling.
- * @param minasonaName The name of the minasona to display.
- * @param imageUrl The image URL of the minasona to display.
- * @returns The tooltip HTMLElement.
- */
-function createFFZToolTip(minasonaName: string, imageUrl: string): HTMLElement {
-  const toolTip = document.createElement("div");
-  toolTip.classList.add("ffz-il-tooltip", "ffz-il-tooltip--align-center", "ffz-il-tooltip--up", "ffz__tooltip--inner", "ffz__tooltip--badges");
-  // style tooltip quirks to look like ffz tooltip
-  toolTip.style.textAlign = "center";
-  toolTip.style.fontWeight = "normal";
-  toolTip.style.fontSize = "1.2rem";
-  toolTip.style.borderRadius = "2px";
-  toolTip.style.marginBottom = "9px";
-  toolTip.style.lineHeight = "1";
-  toolTip.setAttribute("role", "tooltip");
-
-  const badgeTip = document.createElement("div");
-  badgeTip.classList.add("ffz-badge-tip");
-  badgeTip.style.marginBottom = "0";
-  badgeTip.insertAdjacentText("afterbegin", `${minasonaName}`);
-  toolTip.append(badgeTip);
-
-  const badge = document.createElement("div");
-  badge.style.backgroundImage = `url("${imageUrl}")`;
-  badge.classList.add("preview-image", "ffz-badge");
-  badgeTip.prepend(badge);
-
-  return toolTip;
+  window.postMessage({
+    FFZ_MINASONATWITCHEXTENSION_BADGE: {
+      userId: node.querySelector<HTMLElement>("[data-user-id]")?.dataset?.userId ?? 0,
+      iconUrl: minasonaMap[username].iconUrl,
+      imageUrl: minasonaMap[username].imageUrl,
+      username: innerUsernameEl.innerText,
+      isGeneric: defaultMinasonaMap.includes(minasonaMap[username].iconUrl)
+        || defaultMinasonaMap.includes(minasonaMap[username].imageUrl),
+    }
+  });
 }
 
 /**

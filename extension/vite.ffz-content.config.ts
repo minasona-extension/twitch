@@ -5,9 +5,10 @@ export default defineConfig({
     outDir: "dist",
     rollupOptions: {
       input: {
-        background: "src/ffz-content.ts",
+        content: "src/ffz-content.ts",
       },
       output: {
+        inlineDynamicImports: true,
         entryFileNames: "ffz-content.js", // Forces simple names: background.js, content.js
       },
     },

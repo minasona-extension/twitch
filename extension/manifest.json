@@ -18,7 +18,7 @@
     },
     {
       "matches": ["https://*.twitch.tv/*"],
-      "js": ["ffz-listener.js"],
+      "js": ["ffz-integration.js"],
       "world": "MAIN"
     }
   ],

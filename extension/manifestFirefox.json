@@ -15,6 +15,11 @@
       "matches": ["https://*.twitch.tv/*"],
       "js": ["content.js", "ffz-content.js"],
       "css": ["style.css"]
+    },
+    {
+      "matches": ["https://*.twitch.tv/*"],
+      "js": ["ffz-listener.js"],
+      "world": "MAIN"
     }
   ],
   "background": {
