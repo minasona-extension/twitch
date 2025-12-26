@@ -92,17 +92,6 @@
           changed: (val) => this.updateBadges()
         });
 
-        this.settings.add('addon.minasona_twitch_extension.everywan', {
-          default: false,
-          ui: {
-            path: 'Add-Ons > Minasona Twitch Extension >> Badges',
-            title: 'Enable for everywan',
-            description: 'Show Minasonas for everywan.',
-            component: 'setting-check-box',
-          },
-          changed: (val) => window.postMessage({ FFZ_MINASONATWITCHEXTENSION_SETTING_EVERYWAN:val })
-        });
-
         this.settings.add('addon.minasona_twitch_extension.everywhere', {
           default: false,
           ui: {
@@ -111,25 +100,34 @@
             description: 'Show Minasonas in other chats.',
             component: 'setting-check-box',
           },
-          changed: (val) => window.postMessage({ FFZ_MINASONATWITCHEXTENSION_SETTING_EVERYWHERE:val })
+          changed: (val) => window.postMessage({ FFZ_MINASONATWITCHEXTENSION_SETTING_EVERYWHERE: val })
         });
 
-        // Twilight - Sidebar - Preview - Preview Size
+        this.settings.add('addon.minasona_twitch_extension.everywan', {
+          default: false,
+          ui: {
+            path: 'Add-Ons > Minasona Twitch Extension >> Badges',
+            title: 'Enable for everywan',
+            description: 'Show Minasonas for everywan.',
+            component: 'setting-check-box',
+          },
+          changed: (val) => window.postMessage({ FFZ_MINASONATWITCHEXTENSION_SETTING_EVERYWAN: val })
+        });
+
         this.settings.add("addon.minasona_twitch_extension.iconsize", {
           default: '32',
           ui: {
             path: 'Add-Ons > Minasona Twitch Extension >> Badges',
             title: 'Minasona size',
-            description: 'Size of the Minasona badge.',
+            description: 'Size of the Minasona badge between `(21 - 64)`.',
             component: 'setting-text-box',
             process: (newVal, _oldVal) => {
-              console.log(typeof newVal);
-              const iconSize = newVal <= '21' ? '21'
-                : newVal >= '64' ? '64' : newVal;
-              return iconSize;
+              const number = Number(newVal) || Number(_oldVal) || 32;
+              const iconSize = number <= 21 ? 21 : number >= 64 ? 64 : number;
+              return `${iconSize}`;
             },
           },
-          changed: (val) => window.postMessage({ FFZ_MINASONATWITCHEXTENSION_SETTING_SIZE:val })
+          changed: (val) => window.postMessage({ FFZ_MINASONATWITCHEXTENSION_SETTING_SIZE: val })
         });
 
         this.enable();

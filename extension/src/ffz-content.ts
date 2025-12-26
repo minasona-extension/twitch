@@ -13,7 +13,7 @@
     document.head.contains(styleNode) || document.head.appendChild(styleNode);
 
     if (typeof event.data?.FFZ_MINASONATWITCHEXTENSION_READY === 'boolean')
-      switchCSSRule(event.data.FFZ_MINASONATWITCHEXTENSION_READY, `.minasona-icon-container`, `display: none;`);
+      switchCSSRule(event.data.FFZ_MINASONATWITCHEXTENSION_READY, `.minasona-icon-container`, `display: none !important;`);
 
     if (typeof event.data?.FFZ_MINASONATWITCHEXTENSION_ICONSIZE === 'string') 
       switchCSSRule(true, '.ffz-badge[data-badge*="addon.minasona_twitch_extension.badge"]', `
