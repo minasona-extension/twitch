@@ -149,7 +149,7 @@
           if (!this.isEnabled) return;
           this.updateBadges();
         }).bind(this));
-
+        
         window.addEventListener('message', ((event) => {
           // Refresh badges upon changing the setting
           if (event.source !== window) return;
@@ -169,25 +169,39 @@
           if (this.users.has(userId)) return;
           
           const isGeneric = event.data.FFZ_MINASONATWITCHEXTENSION_BADGE.isGeneric;
-          const username = event.data.FFZ_MINASONATWITCHEXTENSION_BADGE.username;
           const imageUrl = event.data.FFZ_MINASONATWITCHEXTENSION_BADGE.imageUrl;
           const iconUrl = event.data.FFZ_MINASONATWITCHEXTENSION_BADGE.iconUrl;
+          const username = event.data.FFZ_MINASONATWITCHEXTENSION_BADGE.username;
           this.users.set(userId, { username, imageUrl, iconUrl, isGeneric });
           
-          this.registerUserBadge(userId, username, imageUrl, iconUrl);
+          this.registerUserBadge(userId, username, imageUrl, iconUrl, isGeneric);
         }).bind(this));
         
         this.updateBadges();
       }
       
       /**
-       * Registers a new badge for a specific user.
+       * Retrieves an string hash code equivalent.
        */
-      async registerUserBadge(userId: string, username: string, imageUrl: string, iconUrl: string) {
+      hashCode(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+          hash = (hash << 5) - hash + str.charCodeAt(i);
+          hash = hash | 0; // Convert to 32bit integer
+        }
+        return hash;
+      }
+      
+      /**
+      * Registers a new badge for a specific user.
+      */
+      async registerUserBadge(userId: string, username: string, imageUrl: string, iconUrl: string, isGeneric:boolean) {
         if (this.isSuspended) return;
         
-        const badgeId = this.getBadgeID(userId);
+        const _userId = isGeneric ? this.hashCode(iconUrl) : userId;
+        const badgeId = this.getBadgeID(_userId);
         const user = this.chat.getUser(userId);
+        
         const hasBadge = user.getBadge(badgeId) !== null;
         if (hasBadge) return;
         
@@ -210,26 +224,23 @@
       }
       
       /**
-       * Refreshes the addon badge configuration.
-       */
+      * Refreshes the addon badge configuration.
+      */
       async updateBadges() {
         for (const user of this.chat.iterateUsers())
           user.removeAllBadges('addon.minasona_twitch_extension');
         
-        for (const [userId, { username, imageUrl, iconUrl, isGeneric }] of this.users.entries()) 
-          if (isGeneric) this.users.delete(userId);
-                
         if (this.isEnabled) {
           for (const [userId, { username, imageUrl, iconUrl, isGeneric }] of this.users.entries())
-            this.registerUserBadge(userId, username, imageUrl, iconUrl);
+            this.registerUserBadge(userId, username, imageUrl, iconUrl, isGeneric);
         }
         
         this.emit('chat:update-lines');
       }
       
       /**
-       * Recovers an identifier to be used by a badge.
-       */
+      * Recovers an identifier to be used by a badge.
+      */
       getBadgeID(userId) {
         return `addon.minasona_twitch_extension.badge-${userId}`;
       }
