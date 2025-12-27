@@ -191,6 +191,7 @@
         });
         
         user.addBadge('addon.minasona_twitch_extension', badgeId);
+        this.emit('chat:update-lines-by-user', userId);
       }
       
       async updateBadges() {
