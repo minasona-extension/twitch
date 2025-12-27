@@ -41,7 +41,7 @@
     maintainer: 'rosrwan',
     description: 'Creates a minasona badge for minawan.',
     version: '1.3',
-    website: '',
+    website: 'https://github.com/minasona-extension/twitch',
     enabled: true,
     requires: [],
     settings: 'add_ons.minasona_twitch_extension',
@@ -79,7 +79,6 @@
         this.inject('settings');
         
         this.users = new Map();
-        this.userBulks = new Map();
         
         this.settings.add('addon.minasona_twitch_extension.badges', {
           default: true,
@@ -138,14 +137,7 @@
         window.postMessage({ FFZ_MINASONATWITCHEXTENSION_READY: true });
       }
       
-      onEnable() {
-        window.addEventListener('message', ((event) => {
-          if (event.source !== window) return;
-          if (typeof event.data?.FFZ_MINASONATWITCHEXTENSION_SHOWFOREVERYONE !== 'boolean') return;
-          if (!this.isEnabled) return;
-          this.updateBadges();
-        }).bind(this));
-        
+      onEnable() {        
         window.addEventListener('message', ((event) => {
           if (event.source !== window) return;
           if (typeof event.data?.FFZ_MINASONATWITCHEXTENSION_SHOWINOTHERCHATS !== 'boolean') return;
@@ -173,56 +165,7 @@
           this.registerUserBadge(userId, username, imageUrl, iconUrl);
         }).bind(this));
         
-        window.addEventListener('message', ((event) => {
-          if (event.source !== window) return;
-          if (!this.isEnabled) return;
-          if (typeof event.data.FFZ_MINASONATWITCHEXTENSION_BADGE !== 'object') return;
-          
-          const isGeneric = event.data.FFZ_MINASONATWITCHEXTENSION_BADGE.isGeneric;
-          if (!isGeneric) return;
-          
-          const userId = event.data.FFZ_MINASONATWITCHEXTENSION_BADGE.userId;
-          const username = event.data.FFZ_MINASONATWITCHEXTENSION_BADGE.username;
-          const iconUrl = event.data.FFZ_MINASONATWITCHEXTENSION_BADGE.iconUrl;
-          const imageUrl = event.data.FFZ_MINASONATWITCHEXTENSION_BADGE.imageUrl;
-          const usernames = this.userBulks.get(iconUrl ?? imageUrl)?.usernames || new Map();
-          usernames.set(userId, { username: username });
-          
-          this.userBulks.set(iconUrl ?? imageUrl, { usernames });
-          this.registerUserBulk();
-        }).bind(this));
-        
         this.updateBadges();
-      }
-      
-      registerUserBulk() {
-        if (this.isSuspended) return;
-        clearInterval(this.interval);
-        
-        this.interval = setTimeout(() => {
-          let i = 0;
-          for (const [badgeUrl, { usernames }] of this.userBulks.entries()) {
-            const users = Array.from(usernames.keys());
-            const badgeId = this.getBadgeID(i);
-            
-            this.badges.loadBadgeData(badgeId, {
-              id: badgeId,
-              title: '',
-              slot: 99,
-              image: badgeUrl,
-              urls: {
-                1: badgeUrl,
-                2: badgeUrl,
-                4: badgeUrl,
-              },
-              click_url: null,
-              svg: false,
-            });
-            
-            this.badges.setBulk('addon.minasona_twitch_extension_badges', badgeId, users);
-            i++;
-          }
-        }, 600);
       }
       
       async registerUserBadge(userId: string, username: string, imageUrl: string, iconUrl: string) {
@@ -253,11 +196,7 @@
       async updateBadges() {
         for (const user of this.chat.iterateUsers())
           user.removeAllBadges('addon.minasona_twitch_extension');
-        
-        for (let i = 0; i <= this.userBulks.size; i++)
-          this.badges.deleteBulk('addon.minasona_twitch_extension_badges', this.getBadgeID(i));
-        this.userBulks.clear();
-        
+                
         if (this.isEnabled) {
           for (const [userId, { username, imageUrl, iconUrl }] of this.users.entries())
             this.registerUserBadge(userId, username, imageUrl, iconUrl);
