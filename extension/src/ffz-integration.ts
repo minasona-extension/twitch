@@ -207,7 +207,7 @@
         
         this.badges.loadBadgeData(badgeId, {
           id: `minasona-preview`,
-          title: username,
+          title: isGeneric ? null : username,
           slot: 99,
           image: iconUrl ?? imageUrl,
           urls: {
