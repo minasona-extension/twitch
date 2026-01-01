@@ -216,9 +216,14 @@
 
         if (!this.localBadges.get(badgeId)) {
           // Loads badge data and reduce requests
+          const wanEx = new RegExp(".*(wan)$", "i");
+          const fileEx = new RegExp("([\\w.-]+\\/)(\\w+)_(\\d+)x(\\d+)\\.(\\w+)", "i");
+          const minawan = wanEx.exec(username)?.[0] ?? fileEx.exec((imageUrl ?? iconUrl))?.[2]
+            ?.replace(new RegExp("minasona", "i"), username);// guessing minawan name 
+            
           const data = {
             id: `minasona-preview`,
-            title: isGeneric ? null : username,
+            title: isGeneric ? null : (minawan ?? username),
             slot: 99,
             image: iconUrl ?? imageUrl,
             urls: {
