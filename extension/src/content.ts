@@ -41,10 +41,10 @@ fetchMinasonaMap();
 startSupervisor();
 
 /**
-* Gets the minasona mapping from browser storage and starts the supervisor.
-* The mapping is set by the background script and updated once per hour.
-* todo: get regularly not just once
-*/
+ * Gets the minasona mapping from browser storage and starts the supervisor.
+ * The mapping is set by the background script and updated once per hour.
+ * todo: get regularly not just once
+ */
 async function fetchMinasonaMap() {
   const result: { minasonaMap?: MinasonaStorage; standardMinasonaUrls?: string[] } = await browser.storage.local.get(["minasonaMap", "standardMinasonaUrls"]);
 
@@ -54,8 +54,8 @@ async function fetchMinasonaMap() {
 }
 
 /**
-* Fetches settings from the browsers storage and applies them to the local variables.
-*/
+ * Fetches settings from the browsers storage and applies them to the local variables.
+ */
 async function applySettings() {
   const result: { showInOtherChats?: boolean; showForEveryone?: boolean; iconSize?: string } = await browser.storage.sync.get([
     "showInOtherChats",
@@ -101,10 +101,10 @@ browser.storage.onChanged.addListener((_changes, namespace) => {
 });
 
 /**
-* Starts the supervisor that checks for chat container changes every 5 seconds.
-* When a new chat container is detected, it mounts a new observer on it.
-* Only call this function once.
-*/
+ * Starts the supervisor that checks for chat container changes every 5 seconds.
+ * When a new chat container is detected, it mounts a new observer on it.
+ * Only call this function once.
+ */
 function startSupervisor() {
   setInterval(() => {
     // get native and 7tv chat containers
@@ -142,9 +142,9 @@ function startSupervisor() {
 }
 
 /**
-* Mounts a mutation observer on the given chat container to monitor new chat messages.
-* @param container The chat container element to observe.
-*/
+ * Mounts a mutation observer on the given chat container to monitor new chat messages.
+ * @param container The chat container element to observe.
+ */
 function mountObserver(container: HTMLElement) {
   disconnectObserver();
 
@@ -175,8 +175,8 @@ function mountObserver(container: HTMLElement) {
 }
 
 /**
-* Disconnects the current observer from the chat container, if any.
-*/
+ * Disconnects the current observer from the chat container, if any.
+ */
 function disconnectObserver() {
   if (currentObserver) {
     currentObserver.disconnect();
@@ -186,9 +186,9 @@ function disconnectObserver() {
 }
 
 /**
-* Processes a newly added node in the chat container.
-* @param node The added node to process.
-*/
+ * Processes a newly added node in the chat container.
+ * @param node The added node to process.
+ */
 function processNode(node: Node) {
   if (!(node instanceof HTMLElement)) return;
 
@@ -282,9 +282,9 @@ function processNode(node: Node) {
 }
 
 /**
-* Gets or creates the popover element for displaying the enlarged minasona image.
-* @returns The popover HTMLElement.
-*/
+ * Gets or creates the popover element for displaying the enlarged minasona image.
+ * @returns The popover HTMLElement.
+ */
 function getOrCreatePopover(): HTMLElement {
   if (!popoverInstance) {
     popoverInstance = document.createElement("div");
@@ -318,11 +318,11 @@ function getOrCreatePopover(): HTMLElement {
 }
 
 /**
-* Shows the minasona popover above to the given icon element.
-* @param minasonaIcon The parent icon element to position the popover above.
-* @param minasonaName The name of the minasona to display.
-* @param imageUrl The image URL of the minasona to display.
-*/
+ * Shows the minasona popover above to the given icon element.
+ * @param minasonaIcon The parent icon element to position the popover above.
+ * @param minasonaName The name of the minasona to display.
+ * @param imageUrl The image URL of the minasona to display.
+ */
 function showMinasonaPopover(minasonaIcon: HTMLElement, imageUrl: string, fallbackImageUrl: string) {
   const popover = getOrCreatePopover();
 
