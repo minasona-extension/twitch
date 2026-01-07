@@ -1,4 +1,28 @@
 (function () {
+  const metadata = {
+    name: 'Minasona Twitch Extension',
+    short_name: 'Minasona Twitch Extension',
+    author: 'HellPingwan',
+    maintainer: 'rosrwan',
+    description: 'Creates a minasona badge for minawan.',
+    version: '1.3',
+    website: 'https://github.com/minasona-extension/twitch',
+    enabled: true,
+    requires: [],
+    settings: 'add_ons.minasona_twitch_extension',
+    icon: 'https://raw.githubusercontent.com/minasona-extension/twitch/640a5ec0f8d49f494944f34e75ede241eb43b0f8/extension/assets/Minawan_Purple.webp',
+    minawan_blue: 'https://raw.githubusercontent.com/minasona-extension/twitch/640a5ec0f8d49f494944f34e75ede241eb43b0f8/extension/assets/Minawan_Blue.webp',
+    minawan_purple: 'https://raw.githubusercontent.com/minasona-extension/twitch/640a5ec0f8d49f494944f34e75ede241eb43b0f8/extension/assets/Minawan_Purple.webp',
+  };
+
+  const defaultNames = {
+    '2083528344': 'green',
+    '565463058': 'red',
+    '1392454998': 'purple',
+    '1607130226': 'yellow',
+    '-549969585': 'blue',
+  };
+
   let baseConfig: { showInOtherChats?: boolean; showForEveryone?: boolean; iconSize?: string } = {};
   function handleMessage(event) {
     if (event.source !== window) return;
@@ -34,30 +58,6 @@
     observer.disconnect();
   }).observe(document.body, { childList: true, subtree: true });
 
-  const metadata = {
-    name: 'Minasona Twitch Extension',
-    short_name: 'Minasona Twitch Extension',
-    author: 'HellPingwan',
-    maintainer: 'rosrwan',
-    description: 'Creates a minasona badge for minawan.',
-    version: '1.3',
-    website: 'https://github.com/minasona-extension/twitch',
-    enabled: true,
-    requires: [],
-    settings: 'add_ons.minasona_twitch_extension',
-    icon: 'https://raw.githubusercontent.com/minasona-extension/twitch/640a5ec0f8d49f494944f34e75ede241eb43b0f8/extension/assets/Minawan_Purple.webp',
-    minawan_blue: 'https://raw.githubusercontent.com/minasona-extension/twitch/640a5ec0f8d49f494944f34e75ede241eb43b0f8/extension/assets/Minawan_Blue.webp',
-    minawan_purple: 'https://raw.githubusercontent.com/minasona-extension/twitch/640a5ec0f8d49f494944f34e75ede241eb43b0f8/extension/assets/Minawan_Purple.webp',
-  };
-
-  const defaultNames = {
-    '2083528344': 'green',
-    '565463058': 'red',
-    '1392454998': 'purple',
-    '1607130226': 'yellow',
-    '-549969585': 'blue',
-  };
-
   /**
    * Called when the FrankerFaceZ addon is ready.
    * @param {Event} event - The event that triggered the callback.
@@ -65,6 +65,10 @@
    */
   function addons_ready(event) {
     class MinasonaTwitchExtension extends window.FrankerFaceZ.utilities.addon.Addon {
+      /**
+       * Returns whether the addon is enabled.
+       * @returns {boolean} Whether the addon is enabled.
+       */
       get isEnabled() {
         return this.settings.get('addon.minasona_twitch_extension.badges');
       }
@@ -135,12 +139,12 @@
       }
 
       /**
-      * Posts the current settings of the addon to the content script.
-      * @param {Object} options - An object containing the current settings of the addon.
-      * @property {string} FFZ_MINASONATWITCHEXTENSION_SETTING_SIZE - The size of the Minasona badge.
-      * @property {boolean} FFZ_MINASONATWITCHEXTENSION_SETTING_EVERYWHERE - Whether to show Minasona badges in other chats.
-      * @property {boolean} FFZ_MINASONATWITCHEXTENSION_SETTING_EVERYWAN - Whether to show Minasona badges for everywan.
-      */
+       * Posts the current settings of the addon to the content script.
+       * @param {Object} options - An object containing the current settings of the addon.
+       * @property {string} FFZ_MINASONATWITCHEXTENSION_SETTING_SIZE - The size of the Minasona badge.
+       * @property {boolean} FFZ_MINASONATWITCHEXTENSION_SETTING_EVERYWHERE - Whether to show Minasona badges in other chats.
+       * @property {boolean} FFZ_MINASONATWITCHEXTENSION_SETTING_EVERYWAN - Whether to show Minasona badges for everywan.
+       */
       postSettings() {
         // probs fixes invalidated context
         const options = {
@@ -153,23 +157,6 @@
       }
 
       onEnable() {
-        window.addEventListener('message', ((event) => {
-          // Refresh badges upon changing the setting
-          if (event.source !== window) return;
-          if (typeof event.data?.FFZ_MINASONATWITCHEXTENSION_SHOWFOREVERYONE !== 'boolean') return;
-          if (!this.isEnabled) return;
-          this.updateBadges();
-        }).bind(this));
-
-        window.addEventListener('message', ((event) => {
-          // Refresh badges upon changing the setting
-          if (event.source !== window) return;
-          if (typeof event.data?.FFZ_MINASONATWITCHEXTENSION_SHOWINOTHERCHATS !== 'boolean') return;
-          if (!this.isEnabled) return;
-          this.showInOtherChats = event.data?.FFZ_MINASONATWITCHEXTENSION_SHOWINOTHERCHATS;
-          this.updateBadges();
-        }).bind(this));
-
         window.addEventListener('message', ((event) => {
           // Creates a new badge
           if (event.source !== window) return;
@@ -213,8 +200,8 @@
       }
 
       /**
-      * Creates a hash code from a string.
-      */
+       * Creates a hash code from a string.
+       */
       getGenericHashCode(chain: string) {
         let hash = 0;
         for (let i = 0; i < chain.length; i++) {
@@ -225,8 +212,8 @@
       }
 
       /**
-      * Refreshes the addon badge configuration on location change.
-      */
+       * Refreshes the addon badge configuration on location change.
+       */
       router_route(event) {
         // some form of memory cleaning
         for (const [userId, options] of this.users)
@@ -237,8 +224,8 @@
       }
 
       /**
-      * Registers a new badge for a specific user.
-      */
+       * Registers a new badge for a specific user.
+       */
       async registerUserBadge(userId: string, username: string, imageUrl: string, iconUrl: string, isGeneric: boolean) {
         const baseId = `addon.minasona_twitch_extension.badge${(isGeneric ? '_generic' : '')}`;
         const user = this.chat.getUser(userId);
@@ -285,8 +272,8 @@
       }
 
       /**
-      * Refreshes the addon badge configuration.
-      */
+       * Refreshes the addon badge configuration.
+       */
       async updateBadges() {
         for (const user of this.chat.iterateUsers())
           user.removeAllBadges('addon.minasona_twitch_extension');
