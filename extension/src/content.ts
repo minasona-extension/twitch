@@ -237,7 +237,7 @@ function processNode(node: Node) {
   if (minasonaMap[username].imageUrl) {
     node.addEventListener("click", (e) => {
       const target = e.target as HTMLElement;
-      const isBadge = target.dataset?.badge?.startsWith("addon.minasona_twitch_extension.badge-");
+      const isBadge = target.dataset?.badge === "addon.minasona_twitch_extension.badge";
       const isIcon = target.classList.contains("minasona-icon");
 
       if (isBadge || isIcon) {

@@ -45,9 +45,24 @@
     enabled: true,
     requires: [],
     settings: 'add_ons.minasona_twitch_extension',
-    icon: 'https://raw.githubusercontent.com/minasona-extension/twitch/refs/heads/main/extension/assets/Minawan_Purple.webp'
+    icon: 'https://raw.githubusercontent.com/minasona-extension/twitch/640a5ec0f8d49f494944f34e75ede241eb43b0f8/extension/assets/Minawan_Purple.webp',
+    minawan_blue: 'https://raw.githubusercontent.com/minasona-extension/twitch/640a5ec0f8d49f494944f34e75ede241eb43b0f8/extension/assets/Minawan_Blue.webp',
+    minawan_purple: 'https://raw.githubusercontent.com/minasona-extension/twitch/640a5ec0f8d49f494944f34e75ede241eb43b0f8/extension/assets/Minawan_Purple.webp',
   };
 
+  const defaultNames = {
+    '2083528344': 'green',
+    '565463058': 'red',
+    '1392454998': 'purple',
+    '1607130226': 'yellow',
+    '-549969585': 'blue',
+  };
+
+  /**
+   * Called when the FrankerFaceZ addon is ready.
+   * @param {Event} event - The event that triggered the callback.
+   * @property {boolean} FFZ_MINASONATWITCHEXTENSION_READY - Whether the addon is ready.
+   */
   function addons_ready(event) {
     class MinasonaTwitchExtension extends window.FrankerFaceZ.utilities.addon.Addon {
       get isEnabled() {
@@ -63,7 +78,6 @@
         this.inject("site.router");
 
         this.users = new Map();
-        this.localBadges = new Map();
 
         this.settings.add('addon.minasona_twitch_extension.badges', {
           default: true,
@@ -121,12 +135,12 @@
       }
 
       /**
-       * Posts the current settings of the addon to the content script.
-       * @param {Object} options - An object containing the current settings of the addon.
-       * @property {string} FFZ_MINASONATWITCHEXTENSION_SETTING_SIZE - The size of the Minasona badge.
-       * @property {boolean} FFZ_MINASONATWITCHEXTENSION_SETTING_EVERYWHERE - Whether to show Minasona badges in other chats.
-       * @property {boolean} FFZ_MINASONATWITCHEXTENSION_SETTING_EVERYWAN - Whether to show Minasona badges for everywan.
-       */
+      * Posts the current settings of the addon to the content script.
+      * @param {Object} options - An object containing the current settings of the addon.
+      * @property {string} FFZ_MINASONATWITCHEXTENSION_SETTING_SIZE - The size of the Minasona badge.
+      * @property {boolean} FFZ_MINASONATWITCHEXTENSION_SETTING_EVERYWHERE - Whether to show Minasona badges in other chats.
+      * @property {boolean} FFZ_MINASONATWITCHEXTENSION_SETTING_EVERYWAN - Whether to show Minasona badges for everywan.
+      */
       postSettings() {
         // probs fixes invalidated context
         const options = {
@@ -163,25 +177,44 @@
           if (!this.isEnabled) return;
 
           const userId = event.data.FFZ_MINASONATWITCHEXTENSION_BADGE.userId;
-          if (this.users.has(userId)) return;
-
           const isGeneric = event.data.FFZ_MINASONATWITCHEXTENSION_BADGE.isGeneric;
           const imageUrl = event.data.FFZ_MINASONATWITCHEXTENSION_BADGE.imageUrl;
           const iconUrl = event.data.FFZ_MINASONATWITCHEXTENSION_BADGE.iconUrl;
           const username = event.data.FFZ_MINASONATWITCHEXTENSION_BADGE.username;
-          this.users.set(userId, { username, imageUrl, iconUrl, isGeneric });
 
           this.registerUserBadge(userId, username, imageUrl, iconUrl, isGeneric);
         }).bind(this));
 
         this.router.on(":route", this.router_route.bind(this));
 
+        this.badges.loadBadgeData("addon.minasona_twitch_extension.badge", {
+          id: "addon.minasona_twitch_extension.badge",
+          base_id: "addon.minasona_twitch_extension.badge",
+          addon: "minasona_twitch_extension",
+          title: "Minawan",
+          slot: 99,
+          click_url: null,
+          svg: false,
+          image: metadata.minawan_blue,
+        });
+
+        this.badges.loadBadgeData("addon.minasona_twitch_extension.badge_generic", {
+          id: "addon.minasona_twitch_extension.badge_generic",
+          base_id: "addon.minasona_twitch_extension.badge_generic",
+          addon: "minasona_twitch_extension",
+          title: "Base Minawan",
+          slot: 99,
+          click_url: null,
+          svg: false,
+          image: metadata.minawan_purple,
+        });
+
         this.updateBadges();
       }
 
       /**
-       * Creates a hash code from a string.
-       */
+      * Creates a hash code from a string.
+      */
       getGenericHashCode(chain: string) {
         let hash = 0;
         for (let i = 0; i < chain.length; i++) {
@@ -192,87 +225,75 @@
       }
 
       /**
-       * Refreshes the addon badge configuration on location change.
-       */
+      * Refreshes the addon badge configuration on location change.
+      */
       router_route(event) {
         // some form of memory cleaning
-        for (const badgeId of this.localBadges.keys())
-          this.badges.removeBadge(badgeId);
+        for (const [userId, options] of this.users)
+          this.badges.removeBadge(options.badge_id);
 
         this.users.clear();
-        this.localBadges.clear();
         this.updateBadges();
       }
 
       /**
-       * Registers a new badge for a specific user.
-       */
+      * Registers a new badge for a specific user.
+      */
       async registerUserBadge(userId: string, username: string, imageUrl: string, iconUrl: string, isGeneric: boolean) {
-        const _userId = isGeneric ? this.getGenericHashCode(iconUrl) : userId;
-        const baseId = `addon.minasona_twitch_extension.badge${isGeneric ? '_generic' : ''}`;
-        const badgeId = `${baseId}-${_userId}`;
+        const baseId = `addon.minasona_twitch_extension.badge${(isGeneric ? '_generic' : '')}`;
         const user = this.chat.getUser(userId);
-        const hasBadge = user.getBadge(badgeId) !== null;
-        if (hasBadge) return;
+        if (user.getBadge(baseId) !== null) return;
 
-        if (!this.localBadges.get(badgeId)) {
-          // Loads badge data and reduce requests
+        const _userId = isGeneric ? this.getGenericHashCode(iconUrl) : `${userId}`;
+        if (_userId === undefined || _userId === null || _userId === "0") return;
+
+        const badgeId = `${baseId}_${_userId}`;
+        let options = this.users.get(_userId);
+        if (!options) {
           const wanEx = new RegExp(".*(wan)$", "i");
           const fileEx = new RegExp("([\\w.-]+\\/)(\\w+)_(\\d+)x(\\d+)\\.(\\w+)", "i");
           const minawan = wanEx.exec(username)?.[0] ?? fileEx.exec((imageUrl ?? iconUrl))?.[2]
             ?.replace(new RegExp("minasona", "i"), username);// guessing minawan name
+          const title = isGeneric ? `Base Minawan\n(${defaultNames[_userId]})` : `${minawan ?? username}`;
 
-          const data = {
-            id: badgeId,
+          this.badges.loadBadgeData(badgeId, {// visual dummy
             base_id: baseId,
             addon: "minasona_twitch_extension",
-            title: isGeneric ? "Base Minawan\n" : "Minawan\n",
-            tooltipExtra: () => {
-              if (isGeneric) {
-                switch (_userId) {
-                  case "2083528344":
-                    return "(green)";
-                  case "565463058":
-                    return "(red)";
-                  case "1392454998":
-                    return "(purple)";
-                  case "1607130226":
-                    return "(yellow)";
-                  case "-549969585":
-                    return "(blue)";
-                }
-              }
-              return `${(minawan ?? username)}`;
-            },
-            slot: 99,
+            title: title,
+            image: iconUrl ?? imageUrl,
+          });
+
+          options = {
+            isGeneric,
+            addon: "minasona_twitch_extension",
+            badge_id: badgeId,
+            base_id: baseId,
+            title: title,
             image: iconUrl ?? imageUrl,
             urls: {
               1: iconUrl,
               2: iconUrl,
               4: imageUrl,
             },
-            click_url: null,
-            svg: false,
-          };
+          }
 
-          this.localBadges.set(badgeId, true);
-          this.badges.loadBadgeData(badgeId, data);
+          this.users.set(_userId, options);
         }
 
-        user.addBadge('addon.minasona_twitch_extension', badgeId, { title: (isGeneric ? null : '\u{E0000}') });
+        user.addBadge('addon.minasona_twitch_extension', baseId, options);
         this.emit('chat:update-lines-by-user', userId);
       }
 
       /**
-       * Refreshes the addon badge configuration.
-       */
+      * Refreshes the addon badge configuration.
+      */
       async updateBadges() {
         for (const user of this.chat.iterateUsers())
           user.removeAllBadges('addon.minasona_twitch_extension');
 
         if (this.isEnabled) {
-          for (const [userId, { username, imageUrl, iconUrl, isGeneric }] of this.users.entries())
-            this.registerUserBadge(userId, username, imageUrl, iconUrl, isGeneric);
+          for (const [userId, options] of this.users.entries())
+            this.registerUserBadge(userId, options.title, options.urls[4], options.urls[1], options.isGeneric);
         }
 
         this.emit('chat:update-lines');
