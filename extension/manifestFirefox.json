@@ -13,17 +13,12 @@
   "content_scripts": [
     {
       "matches": ["https://*.twitch.tv/*"],
-      "js": ["content.js"],
+      "js": ["content.js", "ffzContent.js"],
       "css": ["style.css"]
     },
     {
       "matches": ["https://*.twitch.tv/*"],
-      "js": ["ffz-content.js"],
-      "run_at": "document_idle"
-    },
-    {
-      "matches": ["https://*.twitch.tv/*"],
-      "js": ["ffz-integration.js"],
+      "js": ["ffzIntegration.js"],
       "world": "MAIN"
     }
   ],

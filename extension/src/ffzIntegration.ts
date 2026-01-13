@@ -14,19 +14,18 @@
 
   const defaultMinasonaMap = new Map<string, { name: string; url: string; }>();
   const handleDefaultMinasonaMapMessage = (event) => {
+    // Parse the generic minawan map.
     if (event.source !== window) return;
     if (typeof event.data?.FFZ_MINASONATWITCHEXTENSION_ADDDEFAULTMINASONA !== 'string') return
 
-    const defaultNames = {
+    const hash = getGenericHashCode(event.data?.FFZ_MINASONATWITCHEXTENSION_ADDDEFAULTMINASONA);
+    const name = {
       '2083528344': 'green',
       '565463058': 'red',
       '1392454998': 'purple',
       '1607130226': 'yellow',
       '-549969585': 'blue',
-    };
-
-    const hash = getGenericHashCode(event.data?.FFZ_MINASONATWITCHEXTENSION_ADDDEFAULTMINASONA);
-    const name = defaultNames[hash];
+    }[hash];
     if (!name) return;
 
     defaultMinasonaMap.set(hash, { name, url: event.data?.FFZ_MINASONATWITCHEXTENSION_ADDDEFAULTMINASONA });
@@ -36,28 +35,11 @@
   };
   window.addEventListener('message', handleDefaultMinasonaMapMessage);
 
-  let baseConfig: { showInOtherChats?: boolean; showForEveryone?: boolean; iconSize?: string } = {};
-  const handleConfigMessage = (event) => {
-    if (event.source !== window) return;
-    baseConfig = {
-      showInOtherChats: baseConfig.showInOtherChats ?? event.data?.FFZ_MINASONATWITCHEXTENSION_SHOWINOTHERCHATS as boolean,
-      showForEveryone: baseConfig.showForEveryone ?? event.data?.FFZ_MINASONATWITCHEXTENSION_SHOWFOREVERYONE as boolean,
-      iconSize: baseConfig.iconSize ?? event.data?.FFZ_MINASONATWITCHEXTENSION_ICONSIZE as string
-    };
-    // Check if any property is not null
-    if (baseConfig.showInOtherChats !== null ||
-      baseConfig.showForEveryone !== null ||
-      baseConfig.iconSize !== null
-    )
-      window.removeEventListener('message', handleConfigMessage);
-  }
-  window.addEventListener('message', handleConfigMessage);
-
   let attempts = 0;
   new MutationObserver((mutationsList, observer) => {
     attempts++;
 
-    if (attempts % 40 === 0) {// 10 attempts or give up
+    if (attempts % 40 === 0) {
       observer.disconnect();
       console.log(`Failed to initialize Minasona FFZ addon after ${attempts} attempts`);
       return;

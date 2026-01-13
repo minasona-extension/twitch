@@ -5,11 +5,11 @@ export default defineConfig({
     outDir: "dist",
     rollupOptions: {
       input: {
-        content: "src/ffz-integration.ts",
+        ffzContent: "src/ffzContent.ts",
+        ffzIntegration: "src/ffzIntegration.ts",
       },
       output: {
-        inlineDynamicImports: true,
-        entryFileNames: "ffz-integration.js", // Forces simple names: background.js, content.js
+        entryFileNames: "[name].js",
       },
     },
     emptyOutDir: false,
