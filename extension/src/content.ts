@@ -222,16 +222,7 @@ function processNode(node: Node, channelName: string) {
     iconContainer.append(icon);
   }
 
-  // get badge slot to place icon container there if present
-  // this is needed to preserve usernames containing color gradients and also the correct display of the pronouns extension
-  const badgeSlot = node.querySelector<HTMLElement>(".chat-line__message--badges, .seventv-chat-user-badge-list");
-  if (!badgeSlot && usernameElement) {
-    // just prepend iconContainer to name
-    usernameElement.prepend(iconContainer);
-  } else if (badgeSlot) {
-    // insert after badge slot
-    badgeSlot.append(iconContainer);
-  }
+  displayMinasonaIconContainer(node, iconContainer, usernameElement);
 }
 
 /**
@@ -272,6 +263,39 @@ function createPalsonaEntryList(username: string, channelName: string): PalsonaE
 }
 
 /**
+ * Determine which palsona to use for this user and channel:
+ * 1. Minasona (main channel) image
+ * 2. currently watched channel -sona
+ * after that all other palsonas present for this user
+ *
+ * @param userElement The user element from the Minasona storage.
+ * @param currentChannelName The currently watched channel name.
+ * @returns An array of PalsonaEntrys representing the priority of display.
+ */
+function getPalsonaPriorityList(userElement: { [communityName: string]: PalsonaEntry }, currentChannelName: string): PalsonaEntry[] {
+  if (!userElement || Object.entries(userElement).length == 0) {
+    return [];
+  }
+
+  const palsonaPrioList: PalsonaEntry[] = [];
+  if (userElement[MAIN_CHANNEL]) {
+    palsonaPrioList.push(userElement[MAIN_CHANNEL]);
+  }
+
+  if (MAIN_CHANNEL != currentChannelName && userElement[currentChannelName]) {
+    palsonaPrioList.push(userElement[currentChannelName]);
+  }
+
+  for (const [communityName, entry] of Object.entries(userElement)) {
+    if (communityName == MAIN_CHANNEL || communityName == currentChannelName) {
+      continue;
+    }
+    palsonaPrioList.push(entry);
+  }
+  return palsonaPrioList;
+}
+
+/**
  * Creates a palsona icon for the Twitch chat user and returns the element.
  * @param ps The palsona entry to create the icon for.
  * @returns The icon element.
@@ -304,36 +328,42 @@ function createPalsonaIcon(ps: PalsonaEntry): HTMLPictureElement {
 }
 
 /**
- * Determine which palsona to use for this user and channel:
- * 1. Minasona (main channel) image
- * 2. currently watched channel -sona
- * after that all other palsonas present for this user
- *
- * @param userElement The user element from the Minasona storage.
- * @param currentChannelName The currently watched channel name.
- * @returns An array of PalsonaEntrys representing the priority of display.
+ * Checks if a 7tv or ffz badge slot can be found and adds the icon container into the badge slot. Otherwise it is prepended to the username.
+ * Applies basic spacing to the icon container.
+ * @param node The chat message element.
+ * @param iconContainer The created icon container containing one or multiple palsona icons.
+ * @param usernameElement The extracted username element from the chat message.
  */
-function getPalsonaPriorityList(userElement: { [communityName: string]: PalsonaEntry }, currentChannelName: string): PalsonaEntry[] {
-  if (!userElement || Object.entries(userElement).length == 0) {
-    return [];
+function displayMinasonaIconContainer(node: HTMLElement, iconContainer: HTMLDivElement, usernameElement: HTMLElement) {
+  // get badge slot to place icon container there if present
+  // this is needed to preserve usernames containing color gradients and also the correct display of the pronouns extension
+  const ffzBadgeSlot = node.querySelector<HTMLElement>(".chat-line__message--badges");
+  const sevenTvBadgeSlot = node.querySelector<HTMLElement>(".seventv-chat-user-badge-list");
+
+  if (sevenTvBadgeSlot) {
+    // spacing between previous icon and minasona icon
+    iconContainer.style.marginLeft = "2px";
+    // append to badge slot
+    sevenTvBadgeSlot.append(iconContainer);
+    return;
   }
 
-  const palsonaPrioList: PalsonaEntry[] = [];
-  if (userElement[MAIN_CHANNEL]) {
-    palsonaPrioList.push(userElement[MAIN_CHANNEL]);
+  if (ffzBadgeSlot) {
+    // spacing between icon and username needs to be handled by us again
+    iconContainer.style.marginRight = "2px";
+    // append to badge slot
+    ffzBadgeSlot.append(iconContainer);
+    return;
   }
 
-  if (MAIN_CHANNEL != currentChannelName && userElement[currentChannelName]) {
-    palsonaPrioList.push(userElement[currentChannelName]);
+  // standard Twitch styling
+  if (usernameElement) {
+    // spacing between icon and username needs to be handled by us
+    iconContainer.style.marginRight = "2px";
+    // just prepend iconContainer to name
+    usernameElement.prepend(iconContainer);
+    return;
   }
-
-  for (const [communityName, entry] of Object.entries(userElement)) {
-    if (communityName == MAIN_CHANNEL || communityName == currentChannelName) {
-      continue;
-    }
-    palsonaPrioList.push(entry);
-  }
-  return palsonaPrioList;
 }
 
 /**
