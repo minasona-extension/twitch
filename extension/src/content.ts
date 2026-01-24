@@ -1,4 +1,5 @@
 import { MAIN_CHANNEL } from "./config";
+import { showMinasonaPopover } from "./minasona-popover";
 import { MinasonaStorage, PalsonaEntry } from "./types";
 import browser from "webextension-polyfill";
 
@@ -12,9 +13,6 @@ let currentObserver: MutationObserver | null = null;
 // the user list for the current chat with the current settings
 // this list is used, so we don't have to recalculate which palsona to use each time a user chats
 let currentPalsonaList: { [username: string]: PalsonaEntry[] } = {};
-
-// the popover showing the minasona image when clicking the icon
-let popoverInstance: HTMLElement = null;
 
 // settings - initialize with defaults
 let settingShowInOtherChats = true;
@@ -57,6 +55,8 @@ async function applySettings() {
   if (settingIconSize != result.iconSize) {
     settingIconSize = result.iconSize || "32";
   }
+
+  // reset current lookup list because settings changed and it needs to be regenerated
   currentPalsonaList = {};
 }
 // listen for settings changes
@@ -205,9 +205,7 @@ function processNode(node: Node, channelName: string) {
     currentPalsonaList[username] = createPalsonaEntryList(username, channelName);
   }
 
-  if (currentPalsonaList[username].length == 0) {
-    return;
-  }
+  if (currentPalsonaList[username].length == 0) return;
 
   // create icon container
   const iconContainer = document.createElement("div");
@@ -222,7 +220,7 @@ function processNode(node: Node, channelName: string) {
 }
 
 /**
- * Creates a palsona (priority) list depending on the user settings.
+ * Creates a palsona (priority) list depending on the users settings.
  * @param username The target user.
  * @param channelName The currently watched channel name.
  * @returns The palsona list to display in chat for this user.
@@ -251,6 +249,7 @@ function createPalsonaEntryList(username: string, channelName: string): PalsonaE
     ];
   }
   if (!settingShowAllPalsonas) {
+    // only display one palsona
     palsonas = palsonas[0] ? [palsonas[0]] : [];
   }
 
@@ -258,7 +257,7 @@ function createPalsonaEntryList(username: string, channelName: string): PalsonaE
 }
 
 /**
- * Determine which palsona to use for this user and channel:
+ * Determine which palsona(s) to use for this user and channel using the following priority:
  * 1. Minasona (main channel) image
  * 2. currently watched channel -sona
  * after that all other palsonas present for this user
@@ -332,9 +331,7 @@ function createPalsonaIcon(ps: PalsonaEntry): HTMLPictureElement {
 function displayMinasonaIconContainer(node: HTMLElement, iconContainer: HTMLDivElement, usernameElement: HTMLElement) {
   // get badge slot to place icon container there if present
   // this is needed to preserve usernames containing color gradients and also the correct display of the pronouns extension
-  const ffzBadgeSlot = node.querySelector<HTMLElement>(".chat-line__message--badges");
   const sevenTvBadgeSlot = node.querySelector<HTMLElement>(".seventv-chat-user-badge-list");
-
   if (sevenTvBadgeSlot) {
     // spacing between previous icon and minasona icon
     iconContainer.style.marginLeft = "2px";
@@ -343,6 +340,7 @@ function displayMinasonaIconContainer(node: HTMLElement, iconContainer: HTMLDivE
     return;
   }
 
+  const ffzBadgeSlot = node.querySelector<HTMLElement>(".chat-line__message--badges");
   if (ffzBadgeSlot) {
     // spacing between icon and username needs to be handled by us again
     iconContainer.style.marginRight = "2px";
@@ -359,124 +357,4 @@ function displayMinasonaIconContainer(node: HTMLElement, iconContainer: HTMLDivE
     usernameElement.prepend(iconContainer);
     return;
   }
-}
-
-/**
- * Gets or creates the popover element for displaying the enlarged minasona image.
- * @returns The popover HTMLElement.
- */
-function getOrCreatePopover(): HTMLElement {
-  if (!popoverInstance) {
-    popoverInstance = document.createElement("div");
-    popoverInstance.classList.add("twitch-minasona-popover");
-
-    const loader = document.createElement("div");
-    loader.classList.add("loader");
-    popoverInstance.appendChild(loader);
-
-    // image elements for avif and png as a fallback
-    const source = document.createElement("source");
-    source.type = "image/avif";
-    const img = document.createElement("img");
-    img.loading = "lazy";
-
-    const picture = document.createElement("picture");
-    picture.appendChild(source);
-    picture.appendChild(img);
-    popoverInstance.appendChild(picture);
-
-    document.body.append(popoverInstance);
-
-    // logic to close popover when clicking outside
-    document.addEventListener("click", (e) => {
-      if (popoverInstance.classList.contains("active") && !popoverInstance.contains(e.target as HTMLElement)) {
-        popoverInstance.classList.remove("active");
-      }
-    });
-  }
-  return popoverInstance;
-}
-
-/**
- * Shows the minasona popover above to the given icon element.
- * @param minasonaIcon The parent icon element to position the popover above.
- * @param minasonaName The name of the minasona to display.
- * @param imageUrl The image URL of the minasona to display.
- */
-function showMinasonaPopover(minasonaIcon: HTMLElement, imageUrl: string, fallbackImageUrl: string) {
-  const popover = getOrCreatePopover();
-
-  const picture = popover.querySelector<HTMLPictureElement>("picture");
-  picture.hidden = true;
-  const loader = popover.querySelector<HTMLDivElement>(".loader");
-  loader.style.display = "block";
-  const source = popover.querySelector<HTMLSourceElement>("source");
-  const img = popover.querySelector<HTMLImageElement>("img");
-  img.classList.remove("loaded");
-
-  preloadImage(imageUrl)
-    .then(() => {
-      swapPicture(source, imageUrl, img, fallbackImageUrl, loader, picture);
-    })
-    .catch(() => {
-      // fallback to png
-      preloadImage(fallbackImageUrl).then(() => {
-        swapPicture(source, null, img, fallbackImageUrl, loader, picture);
-      });
-    });
-
-  // get popover dimensions
-  const popoverRect = popover.getBoundingClientRect();
-  const popWidth = popoverRect.width;
-  const popHeight = popoverRect.height;
-  const gap = 10;
-
-  // get bounding box / position of parent
-  const rect = minasonaIcon.getBoundingClientRect();
-  // calc position for popover
-  let leftPos = rect.left + rect.width / 2 - popWidth / 2;
-  let topPos = rect.top - popHeight - gap;
-  if (topPos < 0) {
-    topPos = rect.bottom + gap;
-  }
-  popover.style.left = `${leftPos}px`;
-  popover.style.top = `${topPos}px`;
-
-  // show popover
-  popover.classList.add("active");
-}
-
-async function preloadImage(src: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const i = new Image();
-    i.onload = () => resolve();
-    i.onerror = () => reject();
-    i.src = src;
-  });
-}
-
-/**
- * Swaps loader with picture element once the image is done loading.
- */
-function swapPicture(
-  sourceElement: HTMLSourceElement,
-  avifSrc: string | null,
-  imageElement: HTMLImageElement,
-  pngSrc: string,
-  loader: HTMLDivElement,
-  pictureElement: HTMLPictureElement,
-) {
-  if (avifSrc) {
-    sourceElement.srcset = avifSrc;
-  } else {
-    sourceElement.srcset = "";
-  }
-  imageElement.src = pngSrc;
-
-  loader.style.display = "none";
-  pictureElement.hidden = false;
-
-  requestAnimationFrame(() => {
-    imageElement.classList.add("loaded");
-  });
 }
