@@ -12,9 +12,6 @@ window.addEventListener('message', (event) => {
   document.head.contains(styleNode) || document.head.appendChild(styleNode);
 
   if (typeof event.data?.FFZ_MINASONATWITCHEXTENSION_READY === 'boolean') {// 🍚
-    switchCSSRule(true, `/*0*/.ffz-badge[data-badge^="addon.minasona_twitch_extension.badge"] ~ .minasona-icon-container`, `display: none;`);
-    switchCSSRule(true, `/*0*/.chat-line__username  .minasona-icon-container`, `display: none;`);
-    switchCSSRule(true, `/*0*/.minasona-icon-container:has(+ .ffz-badge[data-badge^="addon.minasona_twitch_extension.badge"])`, `display: none;`);
     switchCSSRule(true, `/*0*/.minasona-icon-container`, `display: none;`);
     switchCSSRule(true, `/*0*/.ffz--tab-container .ffz--menu-container [for^="addon.minasona_twitch_extension.badge"] .ffz-badge.ffz-tooltip`, `
       background-size: contain; 
