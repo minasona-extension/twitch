@@ -55,6 +55,8 @@ https://addons.mozilla.org/de/firefox/addon/minasona-twitch-icons/
 
 ### Building the extension
 
+_Use Node v22.14.0_
+
 1. Install dependencies:
 ```console
 cd extension

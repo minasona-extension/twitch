@@ -52,10 +52,10 @@ async function updateMinasonaMap() {
   }
 }
 
-// update on install and then every UPDATE_INTERVAL mins
+// Update data on install and set up alarm
 browser.runtime.onInstalled.addListener(async () => {
   updateMinasonaMap();
-  browser.alarms.create("refreshMinasonas", { periodInMinutes: UPDATE_INTERVAL });
+  setupAlarm();
 
   // create data urls for standard minasonas
   const data: string[] = [];
@@ -77,8 +77,24 @@ browser.runtime.onInstalled.addListener(async () => {
   browser.storage.local.set({ standardMinasonaUrls: data });
 });
 
+// Update data on browser startup and set up alarm
+browser.runtime.onStartup.addListener(() => {
+  updateMinasonaMap();
+  setupAlarm();
+});
+
 browser.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === "refreshMinasonas") {
     updateMinasonaMap();
   }
 });
+
+/**
+ * Create an alarm (if not existing) for refreshing the minasona data from the API.
+ */
+async function setupAlarm() {
+  const alarm = await browser.alarms.get("refreshMinasonas");
+  if (!alarm) {
+    browser.alarms.create("refreshMinasonas", { periodInMinutes: UPDATE_INTERVAL });
+  }
+}
