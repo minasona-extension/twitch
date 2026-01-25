@@ -34,7 +34,7 @@ const handleDefaultMinasonaMapMessage = (event) => {
 window.addEventListener('message', handleDefaultMinasonaMapMessage);
 
 let attempts = 0;
-let current_callback = function(mutationsList: MutationRecord[], observer: MutationObserver) {
+let current_callback = function (mutationsList: MutationRecord[], observer: MutationObserver) {
   attempts++;
   if (attempts % 10 === 0) {
     observer.disconnect();
@@ -57,6 +57,8 @@ new MutationObserver((mutationsList: MutationRecord[], observer: MutationObserve
  * @property {boolean} FFZ_MINASONATWITCHEXTENSION_READY - Whether the addon is ready.
  */
 function addons_ready(event) {
+  const { ManagedStyle } = FrankerFaceZ.utilities.dom;
+
   class MinasonaTwitchExtension extends FrankerFaceZ.utilities.addon.Addon {
     constructor(...args: any) {
       super(...args);
@@ -66,6 +68,16 @@ function addons_ready(event) {
       this.inject('site.router');
 
       this.users = new Map();
+      this.style = new ManagedStyle();
+      this.style.set('default', `
+        .minasona-icon-container { 
+          display: none; 
+        }
+        .ffz--tab-container .ffz--menu-container [for^="addon.minasona_twitch_extension.badge"] .ffz-badge.ffz-tooltip {
+          background-size: contain; 
+          background-repeat: no-repeat;
+        }
+      `);
 
       this.enable();
       window.postMessage({ FFZ_MINASONATWITCHEXTENSION_READY: true });
@@ -84,7 +96,28 @@ function addons_ready(event) {
         const username = event.data.FFZ_MINASONATWITCHEXTENSION_BADGE.username;
         const index = event.data.FFZ_MINASONATWITCHEXTENSION_BADGE.index;
 
+        this.registerPalsonaTemplate(index);
         this.registerUserBadge(index, userId, username, imageUrl, iconUrl, isGeneric);
+      }).bind(this));
+
+      window.addEventListener('message', ((event) => {
+        if (event.source !== window) return;
+        if (typeof event.data.FFZ_MINASONATWITCHEXTENSION_BADGE !== 'object') return;
+        const iconSize = event.data.FFZ_MINASONATWITCHEXTENSION_BADGE.iconSize;
+
+        this.style.set('size', `
+          .ffz-badge[data-badge^="addon.minasona_twitch_extension.badge"] {
+            min-width: ${iconSize}px;
+            height: ${iconSize}px;
+          }
+        `);
+      }).bind(this));
+
+      window.addEventListener('message', ((event) => {
+        if (event.source !== window) return;
+        if (typeof event.data.FFZ_MINASONATWITCHEXTENSION_REFRESH !== 'boolean') return;
+        if (!event.data.FFZ_MINASONATWITCHEXTENSION_REFRESH) return;
+        this.updateBadges();
       }).bind(this));
 
       this.router.on(":route", this.updateBadges.bind(this));
@@ -117,12 +150,31 @@ function addons_ready(event) {
     }
 
     /**
+     * Registers a new template for a palsona icon.
+     * @param index The index of the palsona template to register.
+     */
+    registerPalsonaTemplate(index: number) {// new template
+      this.palsonaCounter ??= 0;
+      if (this.palsonaCounter <= index) return;
+
+      this.badges.loadBadgeData(`addon.minasona_twitch_extension.badge_palsona${index}`, {
+        base_id: `addon.minasona_twitch_extension.badge_palsona${index}`,
+        addon: "minasona_twitch_extension",
+        title: "Palsona",
+        no_visibility: true,
+        css: 'background-size: contain;background-repeat: no-repeat;',
+      });
+
+      this.palsonaCounter++;
+    }
+
+    /**
      * Registers a new badge for a specific user.
      */
     async registerUserBadge(index: number, userId: string, username: string, imageUrl: string, iconUrl: string, isGeneric: boolean) {
       if (this.users.get(userId)) return;
 
-      const baseId = `addon.minasona_twitch_extension.badge${(isGeneric ? '_generic' : '')}`;
+      const baseId = `addon.minasona_twitch_extension.badge${index > 0 ? `_palsona${index}` : ''}${(isGeneric ? '_generic' : ``)}`;
       const user = this.chat.getUser(userId);
       if (user.getBadge(baseId) !== null) return;
 
@@ -134,7 +186,7 @@ function addons_ready(event) {
       const fileEx = new RegExp("([\\w.-]+\\/)(\\w+)_(\\d+)x(\\d+)\\.(\\w+)", "i");
       const minawan = wanEx.exec(username)?.[0] ?? fileEx.exec((imageUrl ?? iconUrl))?.[2]
         ?.replace(new RegExp("minasona", "i"), username);// guessing minawan name
-      const title = isGeneric ? `Minawan\n(${defaultMinasonaMap.get(_userId)?.name})` : `${minawan ?? username}`;
+      const title = index > 0 ? `${username}` : (isGeneric ? `Minawan\n(${defaultMinasonaMap.get(_userId)?.name})` : `${minawan ?? username}`);
 
       if (!isGeneric) {
         this.badges.loadBadgeData(badgeId, {// visual dummy

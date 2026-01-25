@@ -63,15 +63,7 @@ async function applySettings() {
     settingIconSize = result.iconSize || "32";
   }
 
-  const isCurrentChannelAllowed: boolean = window.location.pathname.toLowerCase()
-    .split("/").filter((seg) => seg.length > 0)[0] === MAIN_CHANNEL;
-  const options = {
-    FFZ_MINASONATWITCHEXTENSION_SHOWINOTHERCHATS: settingShowInOtherChats,
-    FFZ_MINASONATWITCHEXTENSION_ISCURRENTCHANNELALLOWED: isCurrentChannelAllowed,
-    FFZ_MINASONATWITCHEXTENSION_SHOWFOREVERYONE: settingShowForEveryone,
-    FFZ_MINASONATWITCHEXTENSION_ICONSIZE: settingIconSize,
-  };
-  window.postMessage(options);
+  window.postMessage({ FFZ_MINASONATWITCHEXTENSION_REFRESH: true });// refreshes the badges
   // reset current lookup list because settings changed and it needs to be regenerated
   currentPalsonaList = {};
 }
@@ -238,17 +230,26 @@ function processNode(node: Node, channelName: string) {
     if (isFrankerFaceZReady) {
       const isGeneric = defaultMinasonaMap.includes(ps.iconUrl)
         || defaultMinasonaMap.includes(ps.imageUrl);
-      // send badge blueprint to FFZ if available
-      window.postMessage({
-        FFZ_MINASONATWITCHEXTENSION_BADGE: {
-          index: index++,
-          userId: node.querySelector<HTMLElement>("[data-user-id]")?.dataset?.userId ?? 0,
-          iconUrl: ps.iconUrl,
-          imageUrl: ps.imageUrl,
-          username: usernameElement.innerText,
-          isGeneric: isGeneric,
-        }
+      const FFZ_MINASONATWITCHEXTENSION_BADGE = {
+        index: index++,
+        userId: node.querySelector<HTMLElement>("[data-user-id]")?.dataset?.userId ?? 0,
+        iconUrl: ps.iconUrl,
+        imageUrl: ps.imageUrl,
+        username: usernameElement.innerText,
+        isGeneric: isGeneric,
+        iconSize: settingIconSize
+      };
+
+      node.addEventListener("click", (e) => {
+        const target = e.target as HTMLElement;
+        if (target.dataset?.badge !== "addon.minasona_twitch_extension.badge") return;
+        e.preventDefault();
+        e.stopPropagation();
+        showMinasonaPopover(target, ps.imageUrl, ps.fallbackImageUrl);
       });
+
+      // send badge blueprint to FFZ if available
+      window.postMessage({ FFZ_MINASONATWITCHEXTENSION_BADGE });
       return;
     }
   }
