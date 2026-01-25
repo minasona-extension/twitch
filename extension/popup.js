@@ -55,4 +55,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   iconSize.addEventListener("change", () => {
     browser.storage.sync.set({ iconSize: iconSize.value });
   });
+
+  const lastUpdateResult = await browser.storage.local.get(["lastUpdate"]);
+  const lastUpdateElement = document.getElementById("lastUpdate");
+
+  if (lastUpdateElement && lastUpdateResult && lastUpdateResult.lastUpdate) {
+    lastUpdateElement.innerText = new Date(lastUpdateResult.lastUpdate).toLocaleString();
+  }
 });

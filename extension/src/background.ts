@@ -1,5 +1,6 @@
 import browser from "webextension-polyfill";
 import { MinasonaStorage } from "./types";
+import { UPDATE_INTERVAL } from "./config";
 
 const DEFAULT_MINASONAS = [
   "Minawan_Blue.avif",
@@ -44,17 +45,17 @@ async function updateMinasonaMap() {
       });
     });
 
-    browser.storage.local.set({ minasonaMap: reducedData });
+    browser.storage.local.set({ minasonaMap: reducedData, lastUpdate: new Date().getTime() });
     console.log(`${new Date().toLocaleTimeString()} Minasona map updated.`);
   } catch (error) {
     console.error(`${new Date().toLocaleTimeString()} Failed to fetch minasonas: `, error);
   }
 }
 
-// update on install and then every 60 mins
+// update on install and then every UPDATE_INTERVAL mins
 browser.runtime.onInstalled.addListener(async () => {
   updateMinasonaMap();
-  browser.alarms.create("refreshMinasonas", { periodInMinutes: 60 });
+  browser.alarms.create("refreshMinasonas", { periodInMinutes: UPDATE_INTERVAL });
 
   // create data urls for standard minasonas
   const data: string[] = [];

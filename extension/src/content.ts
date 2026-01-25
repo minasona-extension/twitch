@@ -1,4 +1,4 @@
-import { MAIN_CHANNEL } from "./config";
+import { MAIN_CHANNEL, UPDATE_INTERVAL } from "./config";
 import { showMinasonaPopover } from "./minasona-popover";
 import { MinasonaStorage, PalsonaEntry } from "./types";
 import browser from "webextension-polyfill";
@@ -24,6 +24,8 @@ let settingIconSize = "32";
 applySettings();
 fetchMinasonaMap();
 startSupervisor();
+
+setInterval(() => fetchMinasonaMap, UPDATE_INTERVAL * 60 * 1000);
 
 /**
  * Fetches settings from the browsers storage and applies them to the local variables.
@@ -67,8 +69,8 @@ browser.storage.onChanged.addListener((_changes, namespace) => {
 });
 
 /**
- * Gets the minasona mapping from browser storage and starts the supervisor.
- * The mapping is set by the background script and updated once per hour.
+ * Gets the minasona mapping from browser storage.
+ * The mapping is set by the background script and updated every UPDATE_INTERVAL mins.
  */
 async function fetchMinasonaMap() {
   const result: { minasonaMap?: MinasonaStorage; standardMinasonaUrls?: string[] } = await browser.storage.local.get(["minasonaMap", "standardMinasonaUrls"]);
@@ -76,6 +78,8 @@ async function fetchMinasonaMap() {
   if (!result) return;
   minasonaMap = result.minasonaMap || {};
   defaultMinasonaMap = result.standardMinasonaUrls || [];
+
+  console.log("Updated content ts");
 }
 
 /**
