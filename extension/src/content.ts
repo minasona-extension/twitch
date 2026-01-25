@@ -1,4 +1,4 @@
-import { MAIN_CHANNEL, UPDATE_INTERVAL } from "./config";
+import { MAIN_CHANNEL, PRIO_LIST, prioChannel, UPDATE_INTERVAL } from "./config";
 import { showMinasonaPopover } from "./minasona-popover";
 import { MinasonaStorage, PalsonaEntry } from "./types";
 import browser from "webextension-polyfill";
@@ -78,8 +78,6 @@ async function fetchMinasonaMap() {
   if (!result) return;
   minasonaMap = result.minasonaMap || {};
   defaultMinasonaMap = result.standardMinasonaUrls || [];
-
-  console.log("Updated content ts");
 }
 
 /**
@@ -129,6 +127,7 @@ function startSupervisor() {
  */
 function mountObserver(container: HTMLElement) {
   disconnectObserver();
+  currentPalsonaList = {};
 
   currentChatContainer = container;
 
@@ -276,19 +275,24 @@ function getPalsonaPriorityList(userElement: { [communityName: string]: PalsonaE
   }
 
   const palsonaPrioList: PalsonaEntry[] = [];
-  if (userElement[MAIN_CHANNEL]) {
-    palsonaPrioList.push(userElement[MAIN_CHANNEL]);
-  }
 
-  if (MAIN_CHANNEL != currentChannelName && userElement[currentChannelName]) {
-    palsonaPrioList.push(userElement[currentChannelName]);
-  }
-
-  for (const [communityName, entry] of Object.entries(userElement)) {
-    if (communityName == MAIN_CHANNEL || communityName == currentChannelName) {
+  for (const prio of PRIO_LIST) {
+    // other channels -> add all entries that are not main channel or current channel
+    if (prio == prioChannel.OTHER_CHANNELS) {
+      for (const [communityName, entry] of Object.entries(userElement)) {
+        // filter main and current
+        if (communityName == MAIN_CHANNEL || communityName == currentChannelName) continue;
+        palsonaPrioList.push(entry);
+      }
       continue;
     }
-    palsonaPrioList.push(entry);
+
+    const prioString = prio == prioChannel.MAIN_CHANNEL ? MAIN_CHANNEL : prio == prioChannel.CURRENT_CHANNEL ? currentChannelName : "";
+    if (userElement[prioString]) {
+      if (palsonaPrioList.includes(userElement[prioString])) continue;
+      palsonaPrioList.push(userElement[prioString]);
+      continue;
+    }
   }
   return palsonaPrioList;
 }

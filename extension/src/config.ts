@@ -4,3 +4,11 @@ export const MAIN_CHANNEL = "cerbervt";
 
 // interval in minutes to fetch from the API
 export const UPDATE_INTERVAL = 15;
+
+export enum prioChannel {
+  MAIN_CHANNEL,
+  CURRENT_CHANNEL,
+  OTHER_CHANNELS,
+}
+
+export const PRIO_LIST = [prioChannel.CURRENT_CHANNEL, prioChannel.MAIN_CHANNEL, prioChannel.OTHER_CHANNELS];
