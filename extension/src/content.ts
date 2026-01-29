@@ -5,7 +5,10 @@ import browser from "webextension-polyfill";
 import { MinasonaFrankerFaceZAddonHelper } from "./ffzAddon";
 
 const ffzAddonSupport: MinasonaFrankerFaceZAddonHelper = new MinasonaFrankerFaceZAddonHelper();
-ffzAddonSupport.showMinasonaPopoverCallback ??= showMinasonaPopover;
+ffzAddonSupport.onShowMinasonaPopover(showMinasonaPopover);
+ffzAddonSupport.onReady((event: MinasonaFrankerFaceZAddonHelper) => {
+  event.postCommunityBadge("minawan", defaultMinasonaMap?.[4], defaultMinasonaMap?.filter((_, index) => index % 2 === 0));// adds the community
+});
 
 // the mapping of twitch usernames to minasona names and image urls
 let minasonaMap: MinasonaStorage = {};
@@ -27,13 +30,12 @@ let settingIconSize = "32";
 
 applySettings();
 fetchMinasonaMap().then(() => {
-  ffzAddonSupport.setAddonMetadata({
+  ffzAddonSupport.postAddonMetadata({
     name: browser.runtime.getManifest().name,
     description: browser.runtime.getManifest().description,
     version: browser.runtime.getManifest().version,
     icon: defaultMinasonaMap?.[4]
   });
-  ffzAddonSupport.defaultCommunityMap.set("minawan", defaultMinasonaMap);
 });
 startSupervisor();
 
@@ -68,7 +70,7 @@ async function applySettings() {
     settingIconSize = result.iconSize || "32";
   }
   else // refresh badges but on size
-    ffzAddonSupport.refresh();
+    ffzAddonSupport.postRefresh();
 
   // reset current lookup list because settings changed and it needs to be regenerated
   currentPalsonaList = {};
@@ -230,7 +232,8 @@ function processNode(node: Node, channelName: string) {
     iconContainer.append(icon);
 
     if (ffzAddonSupport.isFrankerFaceZReady) {
-      ffzAddonSupport.postBadgeBlueprintToFFZ(node, ps, usernameElement.innerText ?? username, parseInt(settingIconSize) || 32);
+      const isGeneric = defaultMinasonaMap.includes(ps.iconUrl) || defaultMinasonaMap?.includes(ps.imageUrl);
+      ffzAddonSupport.postBadgeBlueprintToFFZ(node, ps, usernameElement.innerText ?? username, parseInt(settingIconSize) || 32, isGeneric);
       if (currentPalsonaList[username.toLocaleLowerCase()].slice(-1)?.[0] === ps) return;// leave on last palsona
     }
   }

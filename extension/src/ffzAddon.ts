@@ -7,10 +7,11 @@ class MinasonaFrankerFaceZAddonHelper extends Object {
   get isFrankerFaceZReady(): boolean {
     return this._isFrankerFaceZReady;
   }
-  private _isFrankerFaceZReady: boolean = false;
 
-  public showMinasonaPopoverCallback: (target: HTMLElement, imageUrl: string, fallbackImageUrl: string) => void = null;
-  public defaultCommunityMap: Map<string, string[]> = new Map();
+  private _storageInterval: NodeJS.Timeout = null;
+  private _isFrankerFaceZReady: boolean = false;
+  private _onShowMinasonaPopoverCallback: ((target: HTMLElement, imageUrl: string, fallbackImageUrl: string) => void)[] = [];
+  private _onReadyCallbacks: ((self: MinasonaFrankerFaceZAddonHelper) => void)[] = [];
 
   constructor(...args: any[]) {
     super(...args);
@@ -18,9 +19,19 @@ class MinasonaFrankerFaceZAddonHelper extends Object {
   }
 
   /**
+   * Loads badges from storage
+   */
+  loadBadgesFromStorage() {
+    if (!this.isFrankerFaceZReady) return;
+    const ffzCommunities: { community: string, iconUrl: string }[] = JSON.parse(localStorage.getItem("FFZ:minasona-twitch-icons.communities")) ?? [];
+    for (const { community, iconUrl } of ffzCommunities)
+      this.postCommunityBadge(community, iconUrl);
+  }
+
+  /**
    * Posts a refresh message to FFZ
    */
-  refresh() {
+  postRefresh() {
     if (!this.isFrankerFaceZReady) return;
     window.postMessage({ FFZ_MINASONATWITCHEXTENSION_REFRESH: true });
   }
@@ -28,7 +39,7 @@ class MinasonaFrankerFaceZAddonHelper extends Object {
   /**
    * Sets the addon icon in FFZ
    */
-  setAddonMetadata(metadata: any) {
+  postAddonMetadata(metadata: any) {
     window.postMessage({
       FFZ_MINASONATWITCHEXTENSION_SETMETADATA: {
         ...metadata,
@@ -46,15 +57,9 @@ class MinasonaFrankerFaceZAddonHelper extends Object {
     window.addEventListener('message', async (event) => {
       if (event.source !== window) return;
       if (typeof event.data?.FFZ_MINASONATWITCHEXTENSION_READY !== "boolean") return;
-
       this._isFrankerFaceZReady = event.data?.FFZ_MINASONATWITCHEXTENSION_READY;
       if (!this.isFrankerFaceZReady) return;
-
-      this.registerCommunityBadge("minawan", this.defaultCommunityMap.get("minawan")?.[4], this.defaultCommunityMap.get("minawan")?.filter((_, index) => index % 2 === 0));// adds the community
-
-      const ffzCommunities: { community: string, iconUrl: string }[] = JSON.parse(localStorage.getItem("FFZ:minasona-twitch-icons.communities"));
-      for (const { community, iconUrl } of ffzCommunities)
-        this.registerCommunityBadge(community, iconUrl);
+      this.onReady(this.loadBadgesFromStorage.bind(this));
     });
   }
 
@@ -64,7 +69,7 @@ class MinasonaFrankerFaceZAddonHelper extends Object {
    * @param iconUrl URL of the community icon
    * @param genericBadges List of generic badge URLs
    */
-  registerCommunityBadge(community: string, iconUrl?: string, genericBadges?: string[]) {
+  postCommunityBadge(community: string, iconUrl?: string, genericBadges?: string[]) {
     if (!this.isFrankerFaceZReady) return;
     window.postMessage({ FFZ_MINASONATWITCHEXTENSION_ADDCOMMUNITY: { community: community, icon: iconUrl, generics: genericBadges } });
   }
@@ -72,12 +77,12 @@ class MinasonaFrankerFaceZAddonHelper extends Object {
   /**
    * Post badge blueprint to FFZ
    */
-  postBadgeBlueprintToFFZ(node: HTMLElement, ps: PalsonaEntry, username: string, iconSize: number) {
+  postBadgeBlueprintToFFZ(node: HTMLElement, ps: PalsonaEntry, username: string, iconSize: number, isGeneric: boolean) {
     if (!this.isFrankerFaceZReady) return;
     const community = /(\w+)\/((\w+)(-backfill)?)\/((\w+)\/)?(\w+)_(\d+)x(\d+)\.(\w+)/i.exec(ps.iconUrl ?? ps.imageUrl)?.[3] ?? "minawan";// backfill counts
 
-    clearInterval(this.storageInterval);// spam prevention
-    this.storageInterval = setTimeout(() => {
+    clearInterval(this._storageInterval);// spam prevention
+    this._storageInterval = setTimeout(() => {
       let ffzCommunities: { community: string, iconUrl: string }[] = JSON.parse(localStorage.getItem("FFZ:minasona-twitch-icons.communities")) ?? [];
       ffzCommunities = ffzCommunities.filter(item => item.community !== community);// remove existing
       ffzCommunities.push({ community: community, iconUrl: ps.iconUrl });// add new
@@ -90,11 +95,8 @@ class MinasonaFrankerFaceZAddonHelper extends Object {
       if (target.dataset?.badge !== `addon.minasona_twitch_extension.badge_${community}`) return;
       e.preventDefault();
       e.stopPropagation();
-      this.showMinasonaPopoverCallback?.(target, ps.imageUrl, ps.fallbackImageUrl);
+      this.onShowMinasonaPopover(target, ps.imageUrl, ps.fallbackImageUrl);
     });
-
-    const isGeneric = this.defaultCommunityMap?.get(community)?.includes(ps.iconUrl)
-      || this.defaultCommunityMap?.get(community)?.includes(ps.imageUrl);
 
     // send badge blueprint to FFZ if available
     window.postMessage({
@@ -108,6 +110,41 @@ class MinasonaFrankerFaceZAddonHelper extends Object {
         community: community
       }
     });
+  }
+
+  /**
+   * Called when FFZ addon is ready.
+   */
+  onReady(callback?: (self: MinasonaFrankerFaceZAddonHelper) => void) {
+    callback && this._onReadyCallbacks.push(callback);
+    if (!this.isFrankerFaceZReady) return;
+    for (const cb of this._onReadyCallbacks)
+      cb?.(this);
+  }
+
+  /**
+   * Registers a callback function for showing the minasona popover.
+   */
+  onShowMinasonaPopover(callback: (target: HTMLElement, imageUrl: string, fallbackImageUrl: string) => void): void;
+
+  /**
+   * Triggers the onshowminasonapopover event.
+   */
+  onShowMinasonaPopover(target: HTMLElement, imageUrl: string, fallbackImageUrl: string): void;
+
+  /**
+   * Registers a callback function for showing the minasona popover or triggers the onshowminasonapopover event.
+   */
+  onShowMinasonaPopover(...args): void {
+    if (args.length === 1 && typeof args[0] === "function") {
+      this._onShowMinasonaPopoverCallback.push(args[0]);
+    } 
+    else if (args.length === 3 && args[0] instanceof HTMLElement && typeof args[1] === "string" && typeof args[2] === "string") {
+      const [target, imageUrl, fallbackImageUrl] = args;
+      if (!this.isFrankerFaceZReady) return;
+      for (const cb of this._onShowMinasonaPopoverCallback)
+        cb?.(target, imageUrl, fallbackImageUrl);
+    }
   }
 }
 
