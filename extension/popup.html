@@ -67,12 +67,14 @@
         border-radius: 8px;
         padding: 2px;
         gap: 2px;
+        font-size: 14px;
       }
 
       .draggable-item {
         padding: 6px;
         border: 1px dashed #d946a6;
         border-radius: 4px;
+        background-color: #f472b527;
       }
 
       input[type="checkbox"] {
@@ -147,27 +149,31 @@
 
         <div id="palsona-manager" class="palsona-manager">
           <div class="draggable-item" draggable="true" data-id="main-channel">
-            <label class="option-label" title="Minawan">
+            <label class="option-label" title="Minasona">
+              <img style="height: 24px; cursor: grab" draggable="false" src="assets/drag-handle-svgrepo-com.svg" />
               <input type="checkbox" id="main-channel" checked disabled />
-              <span><img class="minasona-icon" src="assets/Cerby_64x64.png" />Minasona</span>
+              <span><img class="minasona-icon" draggable="false" src="assets/Cerby_64x64.png" />Minasona</span>
             </label>
           </div>
           <div class="draggable-item" draggable="true" data-id="current-channel">
-            <label class="option-label" title="Palsona for your currently watched channel">
+            <label class="option-label" title="Palsona for the currently watched channel">
+              <img style="height: 24px; cursor: grab" draggable="false" src="assets/drag-handle-svgrepo-com.svg" />
               <input type="checkbox" id="current-channel" />
-              <span><img class="minasona-icon" src="assets/wormpal.png" />Current Channel Palsona</span>
+              <span><img class="minasona-icon" draggable="false" src="assets/wormpal.png" />Current Channel Palsona</span>
             </label>
           </div>
           <div class="draggable-item" draggable="true" data-id="other-channels">
             <label class="option-label" title="Palsonas for all other channels">
+              <img style="height: 24px; cursor: grab" draggable="false" src="assets/drag-handle-svgrepo-com.svg" />
               <input type="checkbox" id="other-channels" />
-              <span><img class="minasona-icon" src="assets/Ditto.png" />Other Palsonas</span>
+              <span><img class="minasona-icon" draggable="false" src="assets/Ditto.png" />Other Palsonas</span>
             </label>
           </div>
           <div class="draggable-item" draggable="true" data-id="default-minasona">
             <label class="option-label" title="Display default Minasona as a fallback if the user has no other Palsonas">
+              <img style="height: 24px; cursor: grab" draggable="false" src="assets/drag-handle-svgrepo-com.svg" />
               <input type="checkbox" id="default-minasona" />
-              <span><img class="minasona-icon" src="assets/Minawan_Purple.webp" />Default Minasona</span>
+              <span><img class="minasona-icon" draggable="false" src="assets/Minawan_Purple.webp" />Default Minasona</span>
             </label>
           </div>
         </div>
@@ -185,7 +191,10 @@
         </label>
       </div>
 
-      <div class="twitch-preview">
+      <div
+        class="twitch-preview"
+        title="This example is for the case when a user has every Palsona you checked above. If they are missing one, a Palsona from a lower priority will be displayed instead, if enabled."
+      >
         <img class="minasona-preview-icon" />
         <img class="minasona-preview-icon" />
         <img class="minasona-preview-icon" />
