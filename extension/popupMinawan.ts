@@ -40,7 +40,7 @@ async function spawnMinawan() {
   minasonaMap = result.minasonaMap || {};
 
   minawanObjects.forEach((object, i) => {
-    object.sprite.src = minasonaMap[credits[i]][MAIN_CHANNEL].iconUrl;
+    object.sprite.src = minasonaMap[credits[i]]["cerbervt"].fallbackIconUrl;
     object.element.style.bottom = "0px";
     object.element.style.left = `${(i / 3) * window.innerWidth + 32}px`;
 
