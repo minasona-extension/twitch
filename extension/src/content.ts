@@ -87,6 +87,7 @@ async function fetchMinasonaMap() {
   if (!result) return;
   minasonaMap = result.minasonaMap || {};
   defaultMinasonaMap = result.standardMinasonaUrls || [];
+  currentPalsonaList = {};
 }
 
 /**
