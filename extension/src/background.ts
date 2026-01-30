@@ -63,8 +63,12 @@ browser.runtime.onInstalled.addListener(async () => {
   for (const asset of DEFAULT_MINASONAS) {
     data.push(await getDataURL(asset));
   }
-
   browser.storage.local.set({ standardMinasonaUrls: data });
+
+  for (const asset of ["Ditto.png", "wormpal.png", "Minawan_Purple.webp"]) {
+    const icon = await getDataURL(asset);
+    browser.storage.local.set({[`${asset}Icon`]: icon});
+  }
 });
 
 // Update data on browser startup and set up alarm
