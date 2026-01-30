@@ -29,7 +29,7 @@ applySettings();
 fetchMinasonaMap();
 startSupervisor();
 
-setInterval(() => fetchMinasonaMap, UPDATE_INTERVAL * 60 * 1000);
+setInterval(fetchMinasonaMap, UPDATE_INTERVAL * 60 * 1000);
 
 /**
  * Fetches settings from the browsers storage and applies them to the local variables.
@@ -88,6 +88,7 @@ async function fetchMinasonaMap() {
   minasonaMap = result.minasonaMap || {};
   defaultMinasonaMap = result.standardMinasonaUrls || [];
   currentPalsonaList = {};
+  console.log(`${new Date().toLocaleTimeString()}: Updated minasona map and reset current lookup list.`);
 }
 
 /**

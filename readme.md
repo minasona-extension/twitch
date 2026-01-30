@@ -34,7 +34,7 @@ https://addons.mozilla.org/firefox/addon/minasona-twitch-icons/
 ### 1.4
 - Supports Palsonas from multiple communities
   - The display of Palsonas for a user is decided by the user selected priority list
-- API updates apply to the chat without the need of reloading the page.
+- Fetches API updates more regularly
 
 - Firefox: Fixed a bug where the extension didn't receive any updates after reopening the browser.
 
