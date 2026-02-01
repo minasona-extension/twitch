@@ -2,6 +2,14 @@ import { MAIN_CHANNEL, UPDATE_INTERVAL } from "./config";
 import { showMinasonaPopover } from "./minasona-popover";
 import { managerEntry, MinasonaStorage, PalsonaEntry } from "./types";
 import browser from "webextension-polyfill";
+import { MinasonaFrankerFaceZAddonHelper } from "./ffzAddon";
+
+const ffzAddonSupport: MinasonaFrankerFaceZAddonHelper = new MinasonaFrankerFaceZAddonHelper();
+ffzAddonSupport.onShowMinasonaPopover(showMinasonaPopover);
+ffzAddonSupport.onReady((event: MinasonaFrankerFaceZAddonHelper) => {
+  event.postCommunityBadge("minawan", minawanIcon, defaultMinasonaMap?.filter((_, index) => index % 2 === 0));// adds the community
+  event.postCommunityBadge("wormpal", wormpalIcon);
+});
 
 // the mapping of twitch usernames to minasona names and image urls
 let minasonaMap: MinasonaStorage = {};
@@ -24,9 +32,18 @@ let settingPalsonaManagerList: managerEntry[] = [
 ];
 let settingPalsonaLimit = "2";
 let settingIconSize = "32";
+let { dittoIcon, wormpalIcon, minawanIcon } = { dittoIcon: "", wormpalIcon: "", minawanIcon: "" };
 
 applySettings();
-fetchMinasonaMap();
+fetchMinasonaMap().then(() => {
+  ffzAddonSupport.postAddonMetadata({
+    name: browser.runtime.getManifest().name,
+    description: browser.runtime.getManifest().description,
+    version: browser.runtime.getManifest().version,
+    icon: minawanIcon || "",
+    genericIcon: dittoIcon || "",
+  });
+});
 startSupervisor();
 
 setInterval(fetchMinasonaMap, UPDATE_INTERVAL * 60 * 1000);
@@ -66,6 +83,8 @@ async function applySettings() {
   if (settingIconSize != result.iconSize) {
     settingIconSize = result.iconSize || "32";
   }
+  else // refresh badges but on size
+    ffzAddonSupport.postRefresh();
 
   // reset current lookup list because settings changed and it needs to be regenerated
   currentPalsonaList = {};
@@ -89,6 +108,11 @@ async function fetchMinasonaMap() {
   defaultMinasonaMap = result.standardMinasonaUrls || [];
   currentPalsonaList = {};
   console.log(`${new Date().toLocaleTimeString()}: Updated minasona map and reset current lookup list.`);
+
+  const iconsResult: { dittoIcon?: string; wormpalIcon?: string; minawanIcon?: string } = await browser.storage.local.get(["dittoIcon", "wormpalIcon", "minawanIcon"]);
+  dittoIcon = iconsResult.dittoIcon as string || "";
+  wormpalIcon = iconsResult.wormpalIcon as string || "";
+  minawanIcon = iconsResult.minawanIcon as string || "";
 }
 
 /**
@@ -225,9 +249,15 @@ function processNode(node: Node, channelName: string) {
   const iconContainer = document.createElement("div");
   iconContainer.classList.add("minasona-icon-container");
 
-  for (const ps of currentPalsonaList[username]) {
+  for (const [index, ps] of Object.entries(currentPalsonaList[username])) {
     const icon = createPalsonaIcon(ps);
     iconContainer.append(icon);
+
+    if (ffzAddonSupport.isFrankerFaceZReady) {
+      const isGeneric = defaultMinasonaMap.includes(ps.iconUrl) || defaultMinasonaMap?.includes(ps.imageUrl);
+      ffzAddonSupport.postBadgeBlueprint(node, ps, parseInt(index) || 0, usernameElement.innerText ?? username, parseInt(settingIconSize) || 32, isGeneric);
+      if (currentPalsonaList[username.toLocaleLowerCase()].slice(-1)?.[0] === ps) return;// leave on last palsona
+    }
   }
 
   displayMinasonaIconContainer(node, iconContainer, usernameElement);
