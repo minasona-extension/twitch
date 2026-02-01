@@ -26,8 +26,18 @@
         this.users = new Map<string, any>();
         this.style = new ManagedStyle();
         this.style.set('default', `
-          :root { 
-            --ffz-minasona-badge-undefined-image: url("${metadata.genericIcon}"); 
+          img[src^="--ffz-minasona-badge-undefined"], 
+          .ffz-badge.preview-image[style*="--ffz-minasona-badge-undefined"]
+          {
+            background-image: url("${metadata.genericIcon}") !important;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            content-visibility: hidden;
+            filter: drop-shadow(1px 1px 0 white)
+                    drop-shadow(-1px 1px 0 white)
+                    drop-shadow(1px -1px 0 white)
+                    drop-shadow(-1px -1px 0 white);
           }
           .minasona-icon-container { 
             display: none; 
@@ -108,22 +118,6 @@
         const communityId = community.replace(/\s+/i, '_');
         const badgeId = `addon.${metadata.addon}.badge_${communityId}`;
 
-        imageUrl || this.style.set(`--ffz-minasona-badge-undefined-${community}`, `
-          img[src^="--ffz-minasona-badge-undefined-${community}"], 
-          .ffz-badge.preview-image[style*="--ffz-minasona-badge-undefined-${community}"]
-          {
-            background-image: var(--ffz-minasona-badge-undefined-image) !important;
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: contain;
-            content-visibility: hidden;
-            filter: drop-shadow(1px 1px 0 white)
-                    drop-shadow(-1px 1px 0 white)
-                    drop-shadow(1px -1px 0 white)
-                    drop-shadow(-1px -1px 0 white);
-          }
-        `);// process image later
-
         this.style.set(`template_${communityId}`, `
           .ffz--tab-container .ffz--menu-container [for^="addon.minasona_twitch_extension.badge"] .ffz-badge.ffz-tooltip[title="${toTitleCase(community)}"]:first-child { display: none; }
         `);
@@ -132,7 +126,7 @@
           base_id: badgeId,
           addon: metadata.addon,
           title: toTitleCase(community),
-          image: imageUrl ?? `--ffz-minasona-badge-undefined-${community}`,
+          image: imageUrl ?? `--ffz-minasona-badge-undefined`,
           css: 'background-size: contain;background-repeat: no-repeat;',
         });
 
