@@ -10,7 +10,7 @@ ffzAddonSupport.on('ready', (event) => {
   event.postCommunityBadge("minawan", browser.runtime.getURL("assets/Minawan_Purple.webp"), defaultMinasonaMap?.filter((_, index) => index % 2 === 0));// adds the community
   event.postCommunityBadge("wormpal", browser.runtime.getURL("assets/wormpal.png"));
 });
-ffzAddonSupport.on('setup', async (event) => {
+ffzAddonSupport.on('setup', (event) => {
   event.postAddonMetadata({
     name: browser.runtime.getManifest().name,
     description: browser.runtime.getManifest().description,

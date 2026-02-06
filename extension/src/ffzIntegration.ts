@@ -1,5 +1,5 @@
 (function () {
-  let metadata: {} = undefined;
+  let metadata: {} = {};
   window.addEventListener('message', addOnMetadata_callBack);
 
   let attempts = 0;
@@ -11,7 +11,7 @@
   /**
    * Called when the FrankerFaceZ addon is ready.
    */
-  function addons_ready(event) {
+  function addons_ready(event:any) {
     const { ManagedStyle } = FrankerFaceZ.utilities.dom;
 
     class MinasonaTwitchExtension extends FrankerFaceZ.utilities.addon.Addon {
@@ -114,7 +114,7 @@
        * Registers a new template for a community icon.
        * @param index The index of the palsona template to register.
        */
-      registerTemplate(community: string, imageUrl: string) {
+      registerTemplate(community: string, imageUrl?: string) {
         const communityId = community.replace(/\s+/i, '_');
         const badgeId = `addon.${metadata.addon}.badge_${communityId}`;
 
@@ -263,7 +263,7 @@
   /**
    * Outpost to parse the icon for the addon.
    */
-  function addOnMetadata_callBack(event) {
+  function addOnMetadata_callBack(event: any) {
     if (event.source !== window) return;
     if (typeof event.data.FFZ_MINASONATWITCHEXTENSION_SETMETADATA !== 'object') return;
     const setMetadata = event.data.FFZ_MINASONATWITCHEXTENSION_SETMETADATA;
