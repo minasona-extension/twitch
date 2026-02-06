@@ -9,7 +9,7 @@ class MinasonaFrankerFaceZAddonHelper extends Object {
   }
 
   private _isFrankerFaceZReady: boolean = false;
-  private _callbacks: Map<string, ((...args) => void)[]> = new Map<string, ((...args) => void)[]>();
+  private _callbacks: Map<string, ((...args: any[]) => void)[]> = new Map<string, ((...args: any[]) => void)[]>();
 
   constructor(...args: any[]) {
     super(...args);
@@ -21,7 +21,7 @@ class MinasonaFrankerFaceZAddonHelper extends Object {
    */
   loadBadgesFromStorage() {
     if (!this.isFrankerFaceZReady) return;
-    const ffzCommunities: string[] = JSON.parse(localStorage.getItem("FFZ:minasona-twitch-icons.communities")) ?? [];
+    const ffzCommunities: string[] = JSON.parse(localStorage.getItem("FFZ:minasona-twitch-icons.communities") ?? "[]") ?? [];
     this.emit('loading-local-badges', ffzCommunities);
     for (const community of ffzCommunities)
       this.postCommunityBadge(community);
@@ -80,11 +80,11 @@ class MinasonaFrankerFaceZAddonHelper extends Object {
    */
   postBadgeBlueprint(node: HTMLElement, ps: PalsonaEntry, index: number, username: string, iconSize: number, isGeneric: boolean) {
     if (!this.isFrankerFaceZReady) return;
-    
+
     this.emit('posting-badge-blueprint', { node: node, ps: ps, index: index, username: username, iconSize: iconSize, isGeneric: isGeneric });
     const community = /(\w+)\/((\w+)(-backfill)?)\/((\w+)\/)?(\w+)_(\d+)x(\d+)\.(\w+)/i.exec(ps.iconUrl ?? ps.imageUrl)?.[3] ?? "minawan";// backfill counts
 
-    let ffzCommunities: string[] = JSON.parse(localStorage.getItem("FFZ:minasona-twitch-icons.communities")) ?? [];
+    let ffzCommunities: string[] = JSON.parse(localStorage.getItem("FFZ:minasona-twitch-icons.communities") ?? "[]") ?? [];
     if (!ffzCommunities.includes(community)) {
       ffzCommunities.push(community);
       localStorage.setItem("FFZ:minasona-twitch-icons.communities", JSON.stringify(ffzCommunities));
@@ -117,25 +117,25 @@ class MinasonaFrankerFaceZAddonHelper extends Object {
   /**
    * Registers a callback
    */
-  on(event: string, callback: (...args) => void) {
-    const callbacks = this._callbacks[event]?.filter(cb => cb !== callback) ?? [];
+  on(event: string, callback: (...args:any[]) => void) {
+    const callbacks = this._callbacks.get(event)?.filter(cb => cb !== callback) ?? [];
     callbacks.push(callback);
-    this._callbacks[event] = callbacks;
+    this._callbacks.set(event, callbacks);
   }
 
   /**
    * Removes a callback
    */
-  off(event: string, callback: (...args) => void) {
-    const callbacks = this._callbacks[event]?.filter(cb => cb !== callback) ?? [];
-    this._callbacks[event] = callbacks;
+  off(event: string, callback: (...args:any[]) => void) {
+    const callbacks = this._callbacks.get(event)?.filter(cb => cb !== callback) ?? [];
+    this._callbacks.set(event, callbacks);
   }
 
   /**
    * Emits an event
    */
-  emit(event: string, ...args) {
-    for (const cb of this._callbacks[event] ?? [])
+  emit(event: string, ...args:any[]) {
+    for (const cb of this._callbacks.get(event) ?? [])
       cb?.(...args);
   }
 }
