@@ -17,3 +17,20 @@ export function getIconSrc(dataId: string): string {
       return "assets/Minawan_Purple.webp";
   }
 }
+
+export function getCommunityName(dataId: string): string {
+  switch (dataId) {
+    case "cerbervt":
+      return "Minawan";
+    case "chrchie":
+      return "Wormpal";
+    case "minikomew":
+      return "Minyan";
+    case "shoomimi":
+      return "Shoominion";
+    case "current-channel":
+      return "Current Channel Palsona";
+    default:
+      return `${dataId.charAt(0).toUpperCase()}${dataId.slice(1)}'s Channel Palsona`;
+  }
+}

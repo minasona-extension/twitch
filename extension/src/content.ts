@@ -1,9 +1,7 @@
-import { MAIN_CHANNEL, UPDATE_INTERVAL } from "./config";
+import { getCommunityName, MAIN_CHANNEL, UPDATE_INTERVAL } from "./config";
 import { showMinasonaPopover } from "./minasona-popover";
 import { managerEntry, MinasonaStorage, PalsonaEntry } from "./types";
 import browser from "webextension-polyfill";
-
-// todo: send custom event to page for disabling the other extension
 
 // the mapping of twitch usernames to minasona names and image urls
 let minasonaMap: MinasonaStorage = {};
@@ -336,6 +334,7 @@ function createPalsonaIcon(ps: PalsonaEntry): HTMLPictureElement {
   img.style.height = `${settingIconSize || "32"}px`;
 
   const icon = document.createElement("picture");
+  icon.title = `${getCommunityName(ps.communityName)} (${ps.communityName.charAt(0).toUpperCase()}${ps.communityName.slice(1)})`;
   icon.appendChild(source);
   icon.appendChild(img);
   // add popover on click if its not a default minasona
