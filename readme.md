@@ -26,7 +26,7 @@ https://microsoftedge.microsoft.com/addons/detail/minasona-twitch-icons/annkpdga
 ### Opera v1.3
 [Download from chrome store](https://chromewebstore.google.com/detail/minasona-twitch-icons/paoappdblefbmihfcjbmcebhdgabfkib)
 
-### Firefox v1.3
+### Firefox v1.4
 https://addons.mozilla.org/firefox/addon/minasona-twitch-icons/
 
 ## Changelog

@@ -3,6 +3,8 @@ import { showMinasonaPopover } from "./minasona-popover";
 import { managerEntry, MinasonaStorage, PalsonaEntry } from "./types";
 import browser from "webextension-polyfill";
 
+// todo: send custom event to page for disabling the other extension
+
 // the mapping of twitch usernames to minasona names and image urls
 let minasonaMap: MinasonaStorage = {};
 let defaultMinasonaMap: string[] = [];
@@ -41,6 +43,8 @@ async function applySettings() {
     "palsonaLimit",
     "iconSize",
   ]);
+  const communityResponse: { communities?: string[] } = await browser.storage.local.get(["communities"]);
+  const communities = communityResponse.communities || [];
 
   if (settingShowInOtherChats != result.showInOtherChats) {
     settingShowInOtherChats = result.showInOtherChats ?? true;
@@ -132,6 +136,18 @@ function startSupervisor() {
   }, 5000);
 }
 
+function getChannelNameFromTwitch(): string {
+  // determine channel name through dom
+  const channelInfoElement = document.querySelector<HTMLDivElement>(".channel-info-content");
+  const hostingChannelElements = channelInfoElement?.querySelectorAll<HTMLLinkElement>('a[href^="/"]'); // get only internal links starting with "/"
+
+  const channelLinks = Array.from(hostingChannelElements).filter((element) => {
+    return element.href.split("/").length === 4; // channel names are in the format "https://twitch.tv/channel" resulting in 4 elements when split
+  });
+
+  return channelLinks[0]?.href.split(".tv/")[1];
+}
+
 /**
  * Mounts a mutation observer on the given chat container to monitor new chat messages.
  * @param container The chat container element to observe.
@@ -142,9 +158,23 @@ function mountObserver(container: HTMLElement) {
 
   currentChatContainer = container;
 
+  let channelName = "";
   // get current channel name from url
   const path = window.location.pathname.toLowerCase();
-  const channelName = path.split("/").filter((seg) => seg.length > 0)[0];
+  const pathItems = path.split("/").filter((seq) => seq.length > 0);
+  for (let i = 0; i < pathItems.length; i++) {
+    const item = pathItems[i];
+    if (item !== "moderator" && item !== "popout") {
+      channelName = item;
+      break;
+    }
+  }
+
+  // handle vods
+  if (channelName === "videos") {
+    channelName = getChannelNameFromTwitch();
+  }
+  if (channelName === "") return;
 
   // if setting does not allow other channels -> check if channel is allowed
   if (!settingShowInOtherChats) {
@@ -270,6 +300,7 @@ function getPalsonaPriorityList(userElement: { [communityName: string]: PalsonaE
       // add default minasona
       const rnd = Math.floor((Math.random() * Object.keys(defaultMinasonaMap).length) / 2) * 2;
       palsonaPrioList.push({
+        communityName: "Minawan",
         iconUrl: defaultMinasonaMap[rnd],
         fallbackIconUrl: defaultMinasonaMap[rnd + 1],
         imageUrl: "",

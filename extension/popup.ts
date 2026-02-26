@@ -1,5 +1,6 @@
 import browser from "webextension-polyfill";
 import { managerEntry } from "./src/types";
+import { getIconSrc } from "./src/config";
 
 document.addEventListener("DOMContentLoaded", main);
 window.browser = browser;
@@ -166,18 +167,5 @@ function updateTwitchPreview() {
   for (let i = iconIndex; i < minasonaIcons.length; i++) {
     minasonaIcons[iconIndex].style.display = "none";
     minasonaIcons[i].src = "";
-  }
-}
-
-function getIconSrc(dataId: string): string {
-  switch (dataId) {
-    case "main-channel":
-      return "assets/Cerby_64x64.png";
-    case "current-channel":
-      return "assets/wormpal.png";
-    case "other-channels":
-      return "assets/Ditto.png";
-    case "default-minasona":
-      return "assets/Minawan_Purple.webp";
   }
 }

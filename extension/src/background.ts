@@ -27,6 +27,7 @@ async function updateMinasonaMap() {
       },
     });
     const data: Record<string, { twitchUsername?: string; avif64?: string; png64?: string; avif256?: string; png256?: string }[]> = await response.json();
+    const communities = Object.keys(data).filter((community) => data[community].length > 0);
 
     const reducedData: MinasonaStorage = {};
     Object.entries(data).forEach(([communityName, members]) => {
@@ -37,6 +38,7 @@ async function updateMinasonaMap() {
           reducedData[lowerCaseUsername] = {};
         }
         reducedData[lowerCaseUsername][communityName] = {
+          communityName: communityName,
           iconUrl: encodeURI(m.avif64 || ""),
           fallbackIconUrl: encodeURI(m.png64 || ""),
           imageUrl: encodeURI(m.avif256 || ""),
@@ -45,7 +47,7 @@ async function updateMinasonaMap() {
       });
     });
 
-    browser.storage.local.set({ minasonaMap: reducedData, lastUpdate: new Date().getTime() });
+    browser.storage.local.set({ minasonaMap: reducedData, lastUpdate: new Date().getTime(), communities: communities });
     console.log(`${new Date().toLocaleTimeString()} Minasona map updated.`);
   } catch (error) {
     console.error(`${new Date().toLocaleTimeString()} Failed to fetch minasonas: `, error);

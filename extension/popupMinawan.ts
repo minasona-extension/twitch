@@ -1,4 +1,3 @@
-import { MAIN_CHANNEL } from "./src/config";
 import { MinasonaStorage } from "./src/types";
 
 declare global {
@@ -27,7 +26,6 @@ minawanObjects.forEach((item) => {
   item.sprite = item.element.childNodes[0] as HTMLImageElement;
 });
 let minasonaMap: MinasonaStorage = {};
-const pettingImage = document.getElementById("petting-effect") as HTMLImageElement;
 
 document.addEventListener("DOMContentLoaded", spawnMinawan);
 async function spawnMinawan() {

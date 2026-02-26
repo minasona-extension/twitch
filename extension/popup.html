@@ -63,8 +63,8 @@
       .palsona-manager {
         display: flex;
         flex-direction: column;
-        border: 1px solid #be185d;
-        border-radius: 8px;
+        border: 2px solid #be185d;
+        border-radius: 12px;
         padding: 2px;
         gap: 2px;
         font-size: 14px;
@@ -73,7 +73,7 @@
       .draggable-item {
         padding: 6px;
         border: 1px dashed #d946a6;
-        border-radius: 4px;
+        border-radius: 8px;
         background-color: #f472b527;
       }
 
@@ -81,6 +81,10 @@
         width: 20px;
         height: 20px;
         cursor: pointer;
+        accent-color: #f472b6;
+      }
+
+      input[type="range"] {
         accent-color: #f472b6;
       }
 
@@ -96,6 +100,7 @@
         display: flex;
         align-items: center;
         text-wrap-mode: nowrap;
+        overflow: hidden;
       }
 
       .minasona-icon {
@@ -134,6 +139,7 @@
       .person {
         font-weight: 700;
         flex: 1;
+        color: #d946a6;
       }
 
       .minawan {
@@ -196,7 +202,7 @@
             <label class="option-label" title="Palsonas for all other channels">
               <img style="height: 24px; cursor: grab" draggable="false" src="assets/drag-handle-svgrepo-com.svg" />
               <input type="checkbox" id="other-channels" />
-              <span><img class="minasona-icon" draggable="false" src="assets/Ditto.png" />Other Palsonas</span>
+              <span><img class="minasona-icon" draggable="false" src="assets/unknown_minasona.png" />Other Palsonas</span>
             </label>
           </div>
           <div class="draggable-item" draggable="true" data-id="default-minasona">
@@ -235,15 +241,17 @@
 
       <div class="thanks">
         <div style="flex: 1">Made by</div>
-        <div style="flex: 1">Hosting & Backend by</div>
-        <div style="flex: 1">Initial Images by</div>
+        <div style="flex: 1">Hosting & Backend</div>
+        <div style="flex: 1">Initial Images</div>
+        <div style="flex: 1">Additional Art</div>
 
         <div style="flex-basis: 100%; height: 0"></div>
         <div class="person">HellPingwan</div>
         <div class="person">Hoopywan</div>
         <div class="person">Hybertwan</div>
+        <a class="person" href="https://x.com/Anzeal14" target="_blank">Anzeal</a>
         <div style="flex-basis: 100%; height: 12px"></div>
-        <div style="flex-basis: 100%">v1.4 - last API update: <span id="lastUpdate"></span></div>
+        <div style="flex-basis: 100%">v1.4.1 - last API update: <span id="lastUpdate"></span></div>
       </div>
     </div>
 

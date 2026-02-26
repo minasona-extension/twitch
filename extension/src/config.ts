@@ -5,8 +5,15 @@ export const MAIN_CHANNEL = "cerbervt";
 // interval in minutes to fetch from the API
 export const UPDATE_INTERVAL = 15;
 
-export enum prioChannel {
-  MAIN_CHANNEL,
-  CURRENT_CHANNEL,
-  OTHER_CHANNELS,
+export function getIconSrc(dataId: string): string {
+  switch (dataId) {
+    case "main-channel":
+      return "assets/Cerby_64x64.png";
+    case "current-channel":
+      return "assets/wormpal.png";
+    case "other-channels":
+      return "assets/unknown_minasona.png";
+    case "default-minasona":
+      return "assets/Minawan_Purple.webp";
+  }
 }
