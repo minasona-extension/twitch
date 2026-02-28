@@ -1,9 +1,10 @@
 import browser from "webextension-polyfill";
-import { managerEntry } from "./src/types";
-import { getIconSrc } from "./src/config";
+import { communityData, managerEntry } from "./src/types";
+import { spawnMinawan } from "./popupMinawan";
 
 document.addEventListener("DOMContentLoaded", main);
-window.browser = browser;
+
+let communityMap: Record<string, communityData> = {};
 
 async function main() {
   // init states
@@ -15,6 +16,9 @@ async function main() {
     "palsonaLimit",
     "iconSize",
   ]);
+  const communityResult: { communities?: Record<string, communityData> } = await browser.storage.local.get(["communities"]);
+  communityMap = communityResult.communities;
+
   // checkbox other chats
   showInOtherChatsCheckbox.checked = result.showInOtherChats ?? true;
 
@@ -36,6 +40,8 @@ async function main() {
   if (lastUpdateElement && lastUpdateResult && lastUpdateResult.lastUpdate) {
     lastUpdateElement.innerText = new Date(lastUpdateResult.lastUpdate).toLocaleString();
   }
+
+  spawnMinawan();
 }
 
 function handlePalsonaManager(managerList: managerEntry[]) {
@@ -161,7 +167,13 @@ function updateTwitchPreview() {
     const checked = item.querySelector("input")?.checked;
     if (!checked || iconIndex >= minasonaIcons.length || iconIndex >= palsonaAmountVal || (iconIndex > 0 && item.dataset.id === "default-minasona")) return;
     minasonaIcons[iconIndex].style.display = "inline-block";
-    minasonaIcons[iconIndex].src = getIconSrc(item.dataset.id);
+    minasonaIcons[iconIndex].src =
+      communityMap[item.dataset.id]?.iconUrl ||
+      (item.dataset.id === "main-channel"
+        ? "assets/Cerby_64x64.png"
+        : item.dataset.id === "current-channel"
+          ? "assets/wormpal.png"
+          : "assets/unknown_minasona.png");
     iconIndex++;
   });
   for (let i = iconIndex; i < minasonaIcons.length; i++) {

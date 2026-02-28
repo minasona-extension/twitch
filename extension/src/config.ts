@@ -4,33 +4,3 @@ export const MAIN_CHANNEL = "cerbervt";
 
 // interval in minutes to fetch from the API
 export const UPDATE_INTERVAL = 15;
-
-export function getIconSrc(dataId: string): string {
-  switch (dataId) {
-    case "main-channel":
-      return "assets/Cerby_64x64.png";
-    case "current-channel":
-      return "assets/wormpal.png";
-    case "other-channels":
-      return "assets/unknown_minasona.png";
-    case "default-minasona":
-      return "assets/Minawan_Purple.webp";
-  }
-}
-
-export function getCommunityName(dataId: string): string {
-  switch (dataId) {
-    case "cerbervt":
-      return "Minawan";
-    case "chrchie":
-      return "Wormpal";
-    case "minikomew":
-      return "Minyan";
-    case "shoomimi":
-      return "Shoominion";
-    case "current-channel":
-      return "Current Channel Palsona";
-    default:
-      return `${dataId.charAt(0).toUpperCase()}${dataId.slice(1)}'s Channel Palsona`;
-  }
-}

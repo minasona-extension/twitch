@@ -1,10 +1,5 @@
 import { MinasonaStorage } from "./src/types";
-
-declare global {
-  interface Window {
-    browser: any;
-  }
-}
+import browser from "webextension-polyfill";
 
 interface MinawanObject {
   element: HTMLDivElement;
@@ -27,10 +22,9 @@ minawanObjects.forEach((item) => {
 });
 let minasonaMap: MinasonaStorage = {};
 
-document.addEventListener("DOMContentLoaded", spawnMinawan);
-async function spawnMinawan() {
+export async function spawnMinawan() {
   // get minasona map
-  const result: { minasonaMap?: MinasonaStorage; standardMinasonaUrls?: string[]; pettingUrl?: string } = await window.browser.storage.local.get([
+  const result: { minasonaMap?: MinasonaStorage; standardMinasonaUrls?: string[]; pettingUrl?: string } = await browser.storage.local.get([
     "minasonaMap",
     "standardMinasonaUrls",
   ]);
