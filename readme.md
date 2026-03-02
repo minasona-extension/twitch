@@ -31,6 +31,11 @@ https://addons.mozilla.org/firefox/addon/minasona-twitch-icons/
 
 ## Changelog
 
+### 1.5
+- Added an upload button to the extension popup which redirect to the Minawan Maker
+- Current channel detected in popout chats and mod view
+- Fixed a bug where the chat would not scroll to the very end with large palsona icons
+
 ### 1.4
 - Supports Palsonas from multiple communities
   - The display of Palsonas for a user is decided by the user selected priority list
