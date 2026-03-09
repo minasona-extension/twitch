@@ -17,24 +17,24 @@ Settings:
 
 ## Out Now
 
-### Chrome v1.3
+### Chrome v1.5
 https://chromewebstore.google.com/detail/minasona-twitch-icons/paoappdblefbmihfcjbmcebhdgabfkib
 
-### Edge v1.3
+### Edge v1.5
 https://microsoftedge.microsoft.com/addons/detail/minasona-twitch-icons/annkpdgajokhpgdncdcfjmadjpafbecp
 
-### Opera v1.3
+### Opera v1.5
 [Download from chrome store](https://chromewebstore.google.com/detail/minasona-twitch-icons/paoappdblefbmihfcjbmcebhdgabfkib)
 
-### Firefox v1.4
+### Firefox v1.5
 https://addons.mozilla.org/firefox/addon/minasona-twitch-icons/
 
 ## Changelog
 
 ### 1.5
-- Added an upload button to the extension popup which redirect to the Minawan Maker
+- Added an upload button to the extension popup which redirects to the Minawan Maker
 - Current channel detected in popout chats and mod view
-- Fixed a bug where the chat would not scroll to the very end with large palsona icons
+- Fixed a bug where the chat would not scroll to the very bottom with large palsona icons
 
 ### 1.4
 - Supports Palsonas from multiple communities
