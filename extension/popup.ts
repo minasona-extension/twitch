@@ -9,24 +9,26 @@ let communityMap: Record<string, communityData> = {};
 async function main() {
   // init states
   const showInOtherChatsCheckbox = document.getElementById("showInOtherChats") as HTMLInputElement;
+  const palsonasInUserCardsCheckbox = document.getElementById("palsonasInUserCards") as HTMLInputElement;
 
-  const result: { showInOtherChats?: boolean; palsonaManagerList?: managerEntry[]; palsonaLimit?: string; iconSize?: string } = await browser.storage.sync.get([
-    "showInOtherChats",
-    "palsonaManagerList",
-    "palsonaLimit",
-    "iconSize",
-  ]);
+  const result: { showInOtherChats?: boolean; palsonaManagerList?: managerEntry[]; palsonaLimit?: string; iconSize?: string; palsonasInUserCards?: boolean } =
+    await browser.storage.sync.get(["showInOtherChats", "palsonaManagerList", "palsonaLimit", "iconSize", "palsonasInUserCards"]);
   const communityResult: { communities?: Record<string, communityData> } = await browser.storage.local.get(["communities"]);
   communityMap = communityResult.communities;
 
   // checkbox other chats
   showInOtherChatsCheckbox.checked = result.showInOtherChats ?? true;
-
   // save new state when user toggles the checkbox
   showInOtherChatsCheckbox.addEventListener("change", () => {
     const isChecked = showInOtherChatsCheckbox.checked;
     // save to storage
     browser.storage.sync.set({ showInOtherChats: isChecked });
+  });
+
+  palsonasInUserCardsCheckbox.checked = result.palsonasInUserCards ?? true;
+  palsonasInUserCardsCheckbox.addEventListener("change", () => {
+    const isChecked = palsonasInUserCardsCheckbox.checked;
+    browser.storage.sync.set({ palsonasInUserCards: isChecked });
   });
 
   handlePalsonaManager(result.palsonaManagerList);

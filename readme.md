@@ -34,7 +34,7 @@ https://addons.mozilla.org/firefox/addon/minasona-twitch-icons/
 ### 1.6
 
 - Added Palsonas to Twitch user cards (can be turned off in the options)
-- Fix: Chat messages now line-break correctly with very large Palsona icons
+- Fixed a bug where chat messages would not line-break correctly with very large Palsona icons
 
 ### 1.5
 - Added an upload button to the extension popup which redirects to the Minawan Maker
