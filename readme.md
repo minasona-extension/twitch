@@ -33,6 +33,7 @@ https://addons.mozilla.org/firefox/addon/minasona-twitch-icons/
 
 ### 1.6
 
+- You can now pet Palsonas by clicking on them in the popup!
 - Added Palsonas to Twitch user cards (can be turned off in the options)
 - Fixed a bug where chat messages would not line-break correctly with very large Palsona icons
 
