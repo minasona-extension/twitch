@@ -386,7 +386,7 @@ function getPalsonaPriorityList(userElement: { [communityName: string]: PalsonaE
     // other channels -> add all entries that are not main channel or current channel
     if (prio.dataId === "other-channels") {
       for (const [communityName, entry] of Object.entries(userElement)) {
-        if (index == limit) break;
+        if (applyLimit && index == limit) break;
         // filter main and current
         if (communityName == MAIN_CHANNEL || communityName == currentChannelName) continue;
         palsonaPrioList.push(entry);
