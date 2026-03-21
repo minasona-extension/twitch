@@ -120,7 +120,7 @@ function handleAmountSlider(palsonaLimit: number) {
   const minasonaIcons = document.querySelectorAll<HTMLImageElement>(".minasona-preview-icon");
 
   palsonaAmount.value = (palsonaLimit || 2).toString();
-  labelText.innerText = `${palsonaLimit || 2} Palsonas`;
+  labelText.innerText = `${palsonaLimit || 2} Palsona${(palsonaLimit || 2) > 1 ? "s" : ""}`;
   for (let i = 0; i < minasonaIcons.length; i++) {
     minasonaIcons[i].style.display = i < palsonaLimit ? "inline-block" : "none";
   }
