@@ -36,6 +36,9 @@ async function updateMinasonaMap() {
         "Content-Type": "application/json",
       },
     });
+    if (!communityResponse.ok) {
+      throw new Error(`HTTP ${communityResponse.status}`);
+    }
     const communityData: { channels: Record<string, communityData> } = await communityResponse.json();
 
     const reducedData: MinasonaStorage = {};
