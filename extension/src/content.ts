@@ -407,6 +407,7 @@ function getPalsonaPriorityList(userElement: { [communityName: string]: PalsonaE
         fallbackIconUrl: defaultMinasonaMap[rnd + 1],
         imageUrl: "",
         fallbackImageUrl: "",
+        backfill: true,
       });
       index++;
       continue;
