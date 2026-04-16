@@ -17,7 +17,7 @@ let currentSevenTvUsercardObserver: MutationObserver | null = null;
 let currentChannelName: string = "";
 // the user list for the current chat with the current settings
 // this list is used, so we don't have to recalculate which palsona to use each time a user chats
-let currentPalsonaList: { [username: string]: PalsonaEntry[] } = {};
+const currentPalsonaList = new Map<string, PalsonaEntry[]>();
 
 // settings - initialize with defaults
 let settingShowInOtherChats = true;
@@ -80,7 +80,7 @@ async function applySettings() {
   }
 
   // reset current lookup list because settings changed and it needs to be regenerated
-  currentPalsonaList = {};
+  currentPalsonaList.clear();
 }
 // listen for settings changes
 browser.storage.onChanged.addListener((_changes, namespace) => {
@@ -99,7 +99,7 @@ async function fetchMinasonaMap() {
   if (!result) return;
   minasonaMap = result.minasonaMap || {};
   defaultMinasonaMap = result.standardMinasonaUrls || [];
-  currentPalsonaList = {};
+  currentPalsonaList.clear();
   console.log(`${new Date().toLocaleTimeString()}: Updated minasona map and reset current lookup list.`);
 }
 
@@ -175,7 +175,7 @@ function getChannelNameFromTwitch(): string {
  */
 function mountObserver(container: HTMLElement) {
   disconnectObserver();
-  currentPalsonaList = {};
+  currentPalsonaList.clear();
 
   currentChatContainer = container;
 
@@ -211,6 +211,8 @@ function mountObserver(container: HTMLElement) {
   currentObserver = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       mutation.addedNodes.forEach((node) => {
+        if (!(node instanceof HTMLElement)) return;
+        if (node.querySelector(".minasona-icon")) return;
         processNode(node);
       });
     });
