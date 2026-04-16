@@ -14,7 +14,7 @@ async function main() {
   const result: { showInOtherChats?: boolean; palsonaManagerList?: managerEntry[]; palsonaLimit?: string; iconSize?: string; palsonasInUserCards?: boolean } =
     await browser.storage.sync.get(["showInOtherChats", "palsonaManagerList", "palsonaLimit", "iconSize", "palsonasInUserCards"]);
   const communityResult: { communities?: Record<string, communityData> } = await browser.storage.local.get(["communities"]);
-  communityMap = communityResult.communities;
+  communityMap = communityResult.communities ?? {};
 
   // checkbox other chats
   showInOtherChatsCheckbox.checked = result.showInOtherChats ?? true;
