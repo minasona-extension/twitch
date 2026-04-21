@@ -72,7 +72,7 @@ async function updateMinasonaMap() {
 /**
  * Checks whether an image URL is allowed.
  */
-function getAllowedUrl(url: string): string {
+function getAllowedUrl(url: string | undefined): string {
   if (!url) return ""; // empty URLs are ok
   try {
     const parsed = new URL(url);

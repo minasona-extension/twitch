@@ -3,7 +3,7 @@ import browser from "webextension-polyfill";
 
 interface MinawanObject {
   element: HTMLDivElement;
-  sprite: HTMLImageElement;
+  sprite: HTMLImageElement | null;
   direction: "left" | "right";
   isPetting: boolean;
 }
@@ -32,6 +32,7 @@ export async function spawnMinawan() {
   minasonaMap = result.minasonaMap || {};
 
   minawanObjects.forEach((object, i) => {
+    if (!object.sprite) return;
     object.sprite.src = minasonaMap[credits[i]]["cerbervt"].fallbackIconUrl;
     object.element.style.bottom = "-7px";
     object.element.style.left = `${(i / 3) * window.innerWidth + 32}px`;

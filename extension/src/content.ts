@@ -157,10 +157,11 @@ function startSupervisor() {
   }, 5000);
 }
 
-function getChannelNameFromTwitch(): string {
+function getChannelNameFromTwitch(): string | undefined {
   // determine channel name through dom
   const channelInfoElement = document.querySelector<HTMLDivElement>(".channel-info-content");
   const hostingChannelElements = channelInfoElement?.querySelectorAll<HTMLLinkElement>('a[href^="/"]'); // get only internal links starting with "/"
+  if (!hostingChannelElements) return;
 
   const channelLinks = Array.from(hostingChannelElements).filter((element) => {
     return element.href.split("/").length === 4; // channel names are in the format "https://twitch.tv/channel" resulting in 4 elements when split
@@ -192,7 +193,7 @@ function mountObserver(container: HTMLElement) {
 
   // handle vods
   if (currentChannelName === "videos") {
-    currentChannelName = getChannelNameFromTwitch();
+    currentChannelName = getChannelNameFromTwitch() || "";
   }
   if (currentChannelName === "") return;
 
@@ -317,7 +318,7 @@ function disconnectObserver() {
  * @param node The chat message element.
  * @returns The username element.
  */
-function getUsernameElement(node: HTMLElement): HTMLElement {
+function getUsernameElement(node: HTMLElement): HTMLElement | undefined {
   // select any elements where the class contains the word "username" or "author"
   // this is most likely the element the username is in, regardless of other installed addons
   const usernameElement = node.querySelector<HTMLElement>('[class*="username"], [class*="author"]');
@@ -351,13 +352,14 @@ function processNode(node: Node) {
     currentPalsonaList.set(username, getPalsonaPriorityList(minasonaMap[username] || {}));
   }
 
-  if (currentPalsonaList.get(username).length == 0) return;
+  const psEntry = currentPalsonaList.get(username);
+  if (!psEntry || psEntry.length == 0) return;
 
   // create icon container
   const iconContainer = document.createElement("div");
   iconContainer.classList.add("minasona-icon-container");
 
-  for (const ps of currentPalsonaList.get(username)) {
+  for (const ps of psEntry) {
     const icon = createPalsonaIcon(ps);
     iconContainer.append(icon);
   }
@@ -522,7 +524,7 @@ function smartScrollNativeChat() {
 function fixLinebreak(usernameElement: HTMLElement, fixInline: boolean) {
   if (fixInline) {
     // username is always a div but text is always a span ... - not needed on FFZ!
-    usernameElement.parentElement.parentElement.childNodes.forEach((child) => {
+    usernameElement.parentElement?.parentElement?.childNodes.forEach((child) => {
       if (!(child instanceof HTMLElement)) return;
       child.style.setProperty("display", "inline", "important");
     });
@@ -536,7 +538,7 @@ function addPalsonaSectionToViewerCard(viewerCard: HTMLElement, bannerElement: H
   viewerCardElement.insertBefore(bannerElement, viewerCardElement.childNodes[1]);
 }
 
-function createPalsonaBanner(username: string): HTMLElement {
+function createPalsonaBanner(username: string): HTMLElement | undefined {
   if (!minasonaMap[username]) return;
   const container = document.createElement("div");
   container.classList.add("viewer-card-palsona");
