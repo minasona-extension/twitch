@@ -225,7 +225,6 @@ function mountObserver(container: HTMLElement) {
     mutations.forEach((mutation) => {
       mutation.addedNodes.forEach((node) => {
         if (!(node instanceof HTMLElement)) return;
-        if (node.querySelector(".minasona-icon")) return;
         processNode(node);
       });
     });
@@ -330,16 +329,9 @@ function disconnectObserver() {
  * @param node The chat message element.
  * @returns The username element.
  */
-function getUsernameElement(node: HTMLElement): HTMLElement | undefined {
-  // select any elements where the class contains the word "username" or "author"
-  // this is most likely the element the username is in, regardless of other installed addons
-  const usernameElement = node.querySelector<HTMLElement>('[class*="username"], [class*="author"]');
-  if (!usernameElement) return;
-  // check if there's another username element inside the detected element
-  // on native this is important to select only the name and not the element containing badges + name
-  const innerUsernameEl = usernameElement.querySelector<HTMLElement>('[class*="username"]');
-
-  return innerUsernameEl || usernameElement;
+function getUsernameElement(node: HTMLElement): HTMLElement | null {
+  const usernameElement = node.querySelector<HTMLElement>(".seventv-chat-user-username, .chat-line__username, .video-chat__message-author");
+  return usernameElement;
 }
 
 /**
@@ -360,9 +352,6 @@ function handleUsernameLocalization(username: string): string {
  */
 function processNode(node: Node) {
   if (!(node instanceof HTMLElement)) return;
-
-  // minasona-icon already appended
-  if (node.querySelector<HTMLElement>(".minasona-icon")) return;
 
   // get username
   const usernameElement = getUsernameElement(node);
