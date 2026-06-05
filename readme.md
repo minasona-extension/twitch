@@ -20,7 +20,7 @@ Settings:
 ### Chrome v1.6.3
 https://chromewebstore.google.com/detail/minasona-twitch-icons/paoappdblefbmihfcjbmcebhdgabfkib
 
-### Edge v1.6.2
+### Edge v1.6.3
 https://microsoftedge.microsoft.com/addons/detail/minasona-twitch-icons/annkpdgajokhpgdncdcfjmadjpafbecp
 
 ### Opera v1.6.3
@@ -30,6 +30,9 @@ https://microsoftedge.microsoft.com/addons/detail/minasona-twitch-icons/annkpdga
 https://addons.mozilla.org/firefox/addon/minasona-twitch-icons/
 
 ## Changelog
+
+#### 1.6.4
+- Fixed: Message history in new 7TV viewercards not scrollable in Firefox
 
 #### 1.6.3
 - Support for new 7TV extension
@@ -73,7 +76,9 @@ https://addons.mozilla.org/firefox/addon/minasona-twitch-icons/
 - Extension working for chromium based browsers
 
 ## Issues
-- [7tv (new)] Palsonas not shown in usercards for Minawan with localized displaynames
+- Hovering a username in a shared chat removes the palsona icon
+- [7TV (new)] Palsonas not shown in usercards for Minawan with localized displaynames
+- [7TV (new)] Usercard Palsona Icons are not clickable
 
 ## Docs
 
