@@ -26,10 +26,14 @@ https://microsoftedge.microsoft.com/addons/detail/minasona-twitch-icons/annkpdga
 ### Opera v1.6.3
 [Download from chrome store](https://chromewebstore.google.com/detail/minasona-twitch-icons/paoappdblefbmihfcjbmcebhdgabfkib)
 
-### Firefox v1.6.3
+### Firefox v1.6.4
 https://addons.mozilla.org/firefox/addon/minasona-twitch-icons/
 
 ## Changelog
+
+#### 1.6.5
+- Fixed: Chatlog spilling over viewercard for users with many badges
+- Fixed: Hovering over usernames in shared chats removes the Minasona icon
 
 #### 1.6.4
 - Fixed: Message history in new 7TV viewercards not scrollable in Firefox
