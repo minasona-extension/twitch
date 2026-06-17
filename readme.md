@@ -33,7 +33,7 @@ https://addons.mozilla.org/firefox/addon/minasona-twitch-icons/
 
 #### 1.6.5
 - Fixed: Chatlog spilling over viewercard for users with many badges
-- Fixed: Hovering over usernames in shared chats removes the Minasona icon
+- Fixed: Hovering over usernames in shared chats removes the Minasona icons
 
 #### 1.6.4
 - Fixed: Message history in new 7TV viewercards not scrollable in Firefox
