@@ -31,6 +31,9 @@ https://addons.mozilla.org/firefox/addon/minasona-twitch-icons/
 
 ## Changelog
 
+#### 1.6.6
+- Fixed: Extension not working in VODs
+
 #### 1.6.5
 - Fixed: Chatlog spilling over viewercard for users with many badges
 - Fixed: Hovering over usernames in shared chats removes the Minasona icons
