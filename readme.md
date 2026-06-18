@@ -17,16 +17,16 @@ Settings:
 
 ## Out Now
 
-### Chrome v1.6.3
+### Chrome v1.6.6
 https://chromewebstore.google.com/detail/minasona-twitch-icons/paoappdblefbmihfcjbmcebhdgabfkib
 
 ### Edge v1.6.3
 https://microsoftedge.microsoft.com/addons/detail/minasona-twitch-icons/annkpdgajokhpgdncdcfjmadjpafbecp
 
-### Opera v1.6.3
+### Opera v1.6.6
 [Download from chrome store](https://chromewebstore.google.com/detail/minasona-twitch-icons/paoappdblefbmihfcjbmcebhdgabfkib)
 
-### Firefox v1.6.4
+### Firefox v1.6.6
 https://addons.mozilla.org/firefox/addon/minasona-twitch-icons/
 
 ## Changelog
@@ -83,9 +83,7 @@ https://addons.mozilla.org/firefox/addon/minasona-twitch-icons/
 - Extension working for chromium based browsers
 
 ## Issues
-- Hovering a username in a shared chat removes the palsona icon
 - [7TV (new)] Palsonas not shown in usercards for Minawan with localized displaynames
-- [7TV (new)] Usercard Palsona Icons are not clickable
 
 ## Docs
 
