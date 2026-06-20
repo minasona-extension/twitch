@@ -31,6 +31,9 @@ https://addons.mozilla.org/firefox/addon/minasona-twitch-icons/
 
 ## Changelog
 
+#### 1.6.7
+- Fixed: Icons not showing up in chat sometimes
+
 #### 1.6.6
 - Fixed: Extension not working in VODs
 
