@@ -17,19 +17,22 @@ Settings:
 
 ## Out Now
 
-### Chrome v1.6.6
+### Chrome v1.6.7
 https://chromewebstore.google.com/detail/minasona-twitch-icons/paoappdblefbmihfcjbmcebhdgabfkib
 
-### Edge v1.6.3
+### Edge v1.6.7
 https://microsoftedge.microsoft.com/addons/detail/minasona-twitch-icons/annkpdgajokhpgdncdcfjmadjpafbecp
 
-### Opera v1.6.6
+### Opera v1.6.7
 [Download from chrome store](https://chromewebstore.google.com/detail/minasona-twitch-icons/paoappdblefbmihfcjbmcebhdgabfkib)
 
-### Firefox v1.6.6
+### Firefox v1.6.7
 https://addons.mozilla.org/firefox/addon/minasona-twitch-icons/
 
 ## Changelog
+
+#### 1.6.8
+- Fixed: Palsonas from inactive communities no longer appear
 
 #### 1.6.7
 - Fixed: Icons not showing up in chat sometimes
