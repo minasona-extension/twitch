@@ -44,6 +44,7 @@ async function updateMinasonaMap() {
 
     const reducedData: MinasonaStorage = {};
     Object.entries(data).forEach(([communityName, members]) => {
+      if (!communityData.channels[communityName]) return;
       members.forEach((m) => {
         if (!m.twitchUsername) return;
         const lowerCaseUsername = m.twitchUsername.toLowerCase();
