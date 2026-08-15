@@ -17,16 +17,16 @@ Settings:
 
 ## Out Now
 
-### Chrome v1.6.7
+### Chrome v1.6.8
 https://chromewebstore.google.com/detail/minasona-twitch-icons/paoappdblefbmihfcjbmcebhdgabfkib
 
-### Edge v1.6.7
+### Edge v1.6.8
 https://microsoftedge.microsoft.com/addons/detail/minasona-twitch-icons/annkpdgajokhpgdncdcfjmadjpafbecp
 
-### Opera v1.6.7
+### Opera v1.6.8
 [Download from chrome store](https://chromewebstore.google.com/detail/minasona-twitch-icons/paoappdblefbmihfcjbmcebhdgabfkib)
 
-### Firefox v1.6.7
+### Firefox v1.6.8
 https://addons.mozilla.org/firefox/addon/minasona-twitch-icons/
 
 ## Changelog
