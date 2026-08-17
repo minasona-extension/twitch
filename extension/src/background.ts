@@ -104,6 +104,8 @@ browser.runtime.onInstalled.addListener(async (details) => {
       await browser.action.openPopup();
     } catch (error) {
       console.error("Failed to open the settings popup:", error);
+
+      await browser.tabs.create({ url: "popup.html" });
     }
   }
 });

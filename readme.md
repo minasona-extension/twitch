@@ -31,6 +31,10 @@ https://addons.mozilla.org/firefox/addon/minasona-twitch-icons/
 
 ## Changelog
 
+#### 1.6.11
+- Settings page opens once on install
+- Added small explanation to settings page
+
 #### 1.6.8
 - Fixed: Palsonas from inactive communities no longer appear
 
